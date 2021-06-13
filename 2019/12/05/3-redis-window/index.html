@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="搭建工具wamp,redis目前稳定版通过https:&#x2F;&#x2F;github.com&#x2F;MicrosoftArchive&#x2F;redis&#x2F;releases 安装">
+<meta name="keywords" content="redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="windows搭建redis">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;05&#x2F;3-redis-window&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="搭建工具wamp,redis目前稳定版通过https:&#x2F;&#x2F;github.com&#x2F;MicrosoftArchive&#x2F;redis&#x2F;releases 安装">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-3.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-4.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-5.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-6.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-8.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-9.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-10.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-11.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-11.png">
+<meta property="og:updated_time" content="2020-05-25T01:35:08.291Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;3-redis-window-1.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/12/05/3-redis-window/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>windows搭建redis | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/05/3-redis-window/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          windows搭建redis
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-05 00:00:00" itemprop="dateCreated datePublished" datetime="2019-12-05T00:00:00+08:00">2019-12-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-25 09:35:08" itemprop="dateModified" datetime="2020-05-25T09:35:08+08:00">2020-05-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/12/05/3-redis-window/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/12/05/3-redis-window/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>819</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="搭建工具"><a href="#搭建工具" class="headerlink" title="搭建工具"></a>搭建工具</h4><p>wamp,redis目前稳定版通过<a href="https://github.com/MicrosoftArchive/redis/releases" target="_blank" rel="noopener">https://github.com/MicrosoftArchive/redis/releases</a> 安装<br><img src="http://xy.liruoning.cn/images/3-redis-window-1.png" align=left><br/><br/><br/></p>
+<a id="more"></a>
+
+<h4 id="下载测试"><a href="#下载测试" class="headerlink" title="下载测试"></a>下载测试</h4><p>下载后将安装包放入你要安装的目录然后进行解压<br>解压之后cd 到相关目录执行<code>redis-server</code>命令出现一下界面表示安装成功<br><img src="http://xy.liruoning.cn/images/3-redis-window-2.png" align=left><br>完成后我们新开一个CMD端口测试是否可以对redis进行相关命令如下图就完成了😊<br><img src="http://xy.liruoning.cn/images/3-redis-window-3.png" align=left><br/><br/><br/> <br/> </p>
+<h4 id="redis后台运行"><a href="#redis后台运行" class="headerlink" title="redis后台运行"></a>redis后台运行</h4><p>由上边的redis启动服务每次启动都要开一个Dos窗口会很麻烦所以我们要把redis后台运行<br>进入redis目录执行以下命令安装 redis服务  </p>
+<p><code>redis-server --service-install redis.windows.conf --loglevel verbose</code>  </p>
+<p>出现下面的界面则表示执行成功了<br><img src="http://xy.liruoning.cn/images/3-redis-window-4.png" align=left><br>然后执行一下命令进行打开和关闭</p>
+<p><code>redis-server --service-start //( 启动服务 )</code><br><code>redis-server --service-stop //（停止服务）</code>   </p>
+<h4 id="修改端口"><a href="#修改端口" class="headerlink" title="修改端口"></a>修改端口</h4><p>当我们运行redis的时候可能会出现端口被占用的情况或者放入服务器使用默认端口会很危险所以需要修改。<br>我们进入redis目录找到相关配置文件 <code>redis-windows-conf</code> ，进入配置文件找到port 进行修改<br><img src="http://xy.liruoning.cn/images/3-redis-window-5.png" align=left> <br/><br/><br>重启redis服务 再次输入<code>redis-cli -p 5525</code>命令就可以连接了</p>
+<h4 id="PHP安装redis扩展"><a href="#PHP安装redis扩展" class="headerlink" title="PHP安装redis扩展"></a>PHP安装redis扩展</h4><p>首先进入 <a href="https://pecl.php.net/" target="_blank" rel="noopener">https://pecl.php.net/</a> 再search搜索redis<br>点击redis下载相关配置<br><img src="http://xy.liruoning.cn/images/3-redis-window-6.png" align=left><br>在网页上打印一下 <code>phpinfo</code> 查看一下三个信息 下载对应的扩展<br><img src="http://xy.liruoning.cn/images/3-redis-window-8.png" align=left><br/><br>点击一下内容下载stable 版的 window<br><img src="http://xy.liruoning.cn/images/3-redis-window-9.png" align=left><br>点击下载对应的版本儿~<br><img src="http://xy.liruoning.cn/images/3-redis-window-10.png" align=left><br/><br/><br/><br>下载解压找到 php_redis.dll文件<br><img src="http://xy.liruoning.cn/images/3-redis-window-11.png" align=left></p>
+<p>复制到PHP的etc 目录下，然后修改php.ini文件加入extension=php_redis.dll<br>重启服务 进入phpinfo页面看到搜索redis如果出现一下页面就成功了。<br><img src="http://xy.liruoning.cn/images/3-redis-window-11.png" align=left><br>到此结束可以折腾你的redis了~</p>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"><i class="fa fa-tag"></i> redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/02/2-nginx/" rel="prev" title="Nginx编译安装">
+      <i class="fa fa-chevron-left"></i> Nginx编译安装
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/06/4-ajax/" rel="next" title="初识Ajax">
+      初识Ajax <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#搭建工具"><span class="nav-number">1.</span> <span class="nav-text">搭建工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载测试"><span class="nav-number">2.</span> <span class="nav-text">下载测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#redis后台运行"><span class="nav-number">3.</span> <span class="nav-text">redis后台运行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改端口"><span class="nav-number">4.</span> <span class="nav-text">修改端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP安装redis扩展"><span class="nav-number">5.</span> <span class="nav-text">PHP安装redis扩展</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

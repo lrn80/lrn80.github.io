@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="正则表达式的基本知识点正则表达式的作用">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP正则表达式回顾">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;06&#x2F;29-PHP%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="正则表达式的基本知识点正则表达式的作用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-06T12:42:05.724Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/06/29-PHP%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>PHP正则表达式回顾 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/06/29-PHP%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          PHP正则表达式回顾
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-02-06 00:00:00 / 修改时间：20:42:05" itemprop="dateCreated datePublished" datetime="2020-02-06T00:00:00+08:00">2020-02-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PHP/" itemprop="url" rel="index">
+                    <span itemprop="name">PHP</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/02/06/29-PHP%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/06/29-PHP%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="正则表达式的基本知识点"><a href="#正则表达式的基本知识点" class="headerlink" title="正则表达式的基本知识点"></a>正则表达式的基本知识点</h4><h5 id="正则表达式的作用"><a href="#正则表达式的作用" class="headerlink" title="正则表达式的作用"></a>正则表达式的作用</h5><a id="more"></a>
+<ol>
+<li><p>分割</p>
+</li>
+<li><p>查找</p>
+</li>
+<li><p>匹配</p>
+</li>
+<li><p>替换字符串</p>
+<h5 id="分隔符"><a href="#分隔符" class="headerlink" title="分隔符"></a>分隔符</h5><p>（/） （#） （~）</p>
+<h5 id="通用原子"><a href="#通用原子" class="headerlink" title="通用原子"></a>通用原子</h5><ol>
+<li>\d  匹配一个数字字符[0-9]</li>
+<li>\D  匹配一个非数字字符 [^0-9]</li>
+<li>\w  匹配包括下划线的任何单词字符，类似但<strong>不等价</strong>于‘[A-Za-z0-9_]’</li>
+<li>\W 匹配任何非单词字符。’[^A-Za-z0-9]‘</li>
+<li>\s   匹配任何不可见字符，包括空格、制表符、换页符。等价于[\f\n\r\t\v]</li>
+<li>\S 匹配任何的可见字符 ，等价于[^\f\n\r\t\v]</li>
+</ol>
+<h5 id="元字符"><a href="#元字符" class="headerlink" title="元字符"></a>元字符</h5><ol>
+<li>点(.)  除了换行之外的任意<strong>单字符</strong></li>
+<li>*   匹配前面的表达式出现0-多次 ，等价于{0,}。<strong>例如：</strong>ab*  能匹配  a ab  abb</li>
+<li>?  匹配前面的表达式出现 0或者1次 ，等价于{0,1}  <strong>例如:</strong> ab(es)?  能匹配 ab 或 ab(es)</li>
+<li>^  匹配输入字符的开始位置  </li>
+<li>$  匹配输入字符的结束位置</li>
+<li>+  匹配前面的表达式出现一次或多次 <strong>例如:</strong>能匹配  ab  abb 但不能匹配 a</li>
+<li>{n}  是确定的正数匹配确定的n次  <strong>例如:</strong> “o{2}“ 不能匹配 Bob 但是能匹配 food </li>
+<li>{n,}  至少匹配 n 次  <strong>例如</strong>  “o{2,}” 不能匹配Bob 但是可以匹配 fooooooood中的所有的 o。</li>
+<li>{n,m}  至少匹配 n 次 最多匹配 m次</li>
+<li><input disabled="" type="checkbox"> 字符集合匹配所包含的任意字符 <strong>例如:</strong> [abc] 可以匹配pian中的 a</li>
+<li>( )  可以代表一个整体 定义一个组</li>
+<li>[^] 取反的意思</li>
+<li>|    x|y 匹配 x 或 y</li>
+<li>[-]   [0-9] 匹配的是 0到 9 的数字</li>
+</ol>
+<h5 id="模式修正符"><a href="#模式修正符" class="headerlink" title="模式修正符"></a>模式修正符</h5><ul>
+<li><p>模式修正符号，一个字符就是一个功能，可以组合使用</p>
+<p><strong>例如 ：</strong> “/go*gle/ieU”</p>
+</li>
+</ul>
+<ol>
+<li>i  模式中的字符将同时匹配大小写字母(不区分大小写)</li>
+<li>m  字符串视为多行进行处理。 在使用^ 或 $ 这两个符号时，每一行满足都可以。（正则表达式默认是视为一行处理的）</li>
+<li>s   正则表达式中的 . 可以匹配换行 （默认 . 不能匹配回车换行）</li>
+<li>U （.<em>）或者（.+）的情况正则表达式比较贪婪， U可以解决贪婪     (.\</em>?)  (.+?)  一般U我们不会用 都是加一个？来解决贪婪模式。</li>
+<li>x  如果设置了这个修饰符，模式中的<strong>没有经过转义</strong>的或<strong>不在字符类</strong>中的<strong>空白数据字符</strong>总会被忽略， 并且位于一个<strong>未转义</strong>的<strong>字符类</strong>外部的#字符和下一个换行符之间的字符也被忽略。 </li>
+<li>A  必须以这个模式开头</li>
+<li>D  如果这个修饰符被设置，模式中的元字符美元符号仅仅匹配目标字符串的末尾。</li>
+<li>u  UTF-8中文匹配用到。</li>
+</ol>
+</li>
+</ol>
+<h5 id="正则表达式PCRE函数"><a href="#正则表达式PCRE函数" class="headerlink" title="正则表达式PCRE函数"></a>正则表达式PCRE函数</h5><ol>
+<li>preg_match(): 执行一个正则表达式匹配。</li>
+</ol>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$subject = <span class="string">"abcdef"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$pattern = <span class="string">'/^abc/'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">preg_match($pattern, $subject, $matches);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">print_r($matches);<span class="comment">//Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//    [0] =&gt; abc</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//)</span></span></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>preg_match_all():使用正则表达式（规则）对字符串进行筛选，筛选到结果先保存到数组，并继续筛选，直到字符串结束</p>
+</li>
+<li><p>preg_replace():    使用正则表达式（规则）对字符串进行筛选，再将筛选的内容进行替换。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"one,two,one"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$reg = <span class="string">"/one/"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$result = preg_replace($reg,<span class="string">"three"</span>,$str);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $result; <span class="comment">//three,two,three</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>preg_split():使用preg_split可以先根据定义的规则进行筛选，再根据筛选的结果拆分字符串</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"one,two,one!three!four"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$reg = <span class="string">"/[,!]/"</span>; <span class="comment">//按照 ， ！ 进行分割 </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$result = preg_split($reg,$str);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">print_r($result); <span class="comment">// Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//[0] =&gt; one</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//[1] =&gt; two</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//[2] =&gt; one</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//[3] =&gt; three</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//[4] =&gt; four</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//)</span></span></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h5 id="后向引用"><a href="#后向引用" class="headerlink" title="后向引用"></a>后向引用</h5><p>  正则表达式一个最重要的特性就是将匹配成功的模式的某部分进行存储供以后使用这一能力。<br>对一个正则表达式模式或部分模式两边添加圆括号<strong>()</strong>可以把这部分表达式存储到一个临时缓冲区中。 </p>
+<p>所捕获的每个子匹配都按照在正则表达式模式中从左至右所遇到的内容按顺序存储。<br>存储子匹配的缓冲区编号从1开始，连续编号至最大99个子表达式。<br>每个缓冲区都可以使用’\n’(或用’$n’)访问，其中n为1至99的阿拉伯数字，用来按顺序标识特定缓冲区(子表达式)。<br>原文链接：<a href="https://blog.csdn.net/qq_20408491/article/details/75095055" target="_blank" rel="noopener">https://blog.csdn.net/qq_20408491/article/details/75095055</a></p>
+<p><strong>例子：</strong></p>
+<p>讲str字符串替换成不带&lt;b&gt;标签的</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">'&lt;b&gt;abc&lt;/b&gt;'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$pattern = <span class="string">'/&lt;b&gt;(.*)&lt;\/b&gt;/'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$strabc=preg_replace($pattern,<span class="string">"\\1"</span>,$str);  <span class="comment">// \\1 代表的就是第一个()的内容</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $strabc;  <span class="comment">//abc</span></span></pre></td></tr></table></figure>
+
+<h6 id="贪婪模式"><a href="#贪婪模式" class="headerlink" title="贪婪模式"></a>贪婪模式</h6><p>首先我想匹配是&lt;b&gt;标签里面的内容 但是 由于贪婪模式 他匹配的为第一个&lt;b&gt;和&lt;/b&gt;之间的内容</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">'&lt;b&gt;abc&lt;/b&gt;&lt;b&gt;dsads&lt;/b&gt;'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$pattern = <span class="string">'/&lt;b&gt;(.*)&lt;\/b&gt;/'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$strabc=preg_replace($pattern,<span class="string">"\\1"</span>,$str);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $strabc;  <span class="comment">//abc&lt;/b&gt;&lt;b&gt;dsads</span></span></pre></td></tr></table></figure>
+
+<ul>
+<li>解决贪婪模式</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">'&lt;b&gt;abc&lt;/b&gt;&lt;b&gt;dsads&lt;/b&gt;'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$pattern = <span class="string">'/&lt;b&gt;(.*?)&lt;\/b&gt;/'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$strabc=preg_replace($pattern,<span class="string">"\\1"</span>,$str);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $strabc;  <span class="comment">//abcdsads</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">'&lt;b&gt;abc&lt;/b&gt;&lt;b&gt;dsads&lt;/b&gt;'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">$pattern = <span class="string">'/&lt;b&gt;(.*)&lt;\/b&gt;/U'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">$strabc=preg_replace($pattern,<span class="string">"\\1"</span>,$str);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $strabc;  <span class="comment">//abcdsads</span></span></pre></td></tr></table></figure>
+
+<p>加一个？ 或者使用模式修正符U都可以取消贪婪模式。</p>
+<h6 id="中文匹配"><a href="#中文匹配" class="headerlink" title="中文匹配"></a>中文匹配</h6><p><strong>UTF-8</strong>汉字编码范围是<strong>0x4e00-0x9fa5</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"中文"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$reg = <span class="string">'/[\x&#123;4e00&#125;-\x&#123;9fa5&#125;]+/u'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">preg_match($reg,$str,$match);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">var_dump($match);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//array(1) &#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//    [0]=&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//  string(6) "中文"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//&#125;</span></span></pre></td></tr></table></figure>
+
+<p><strong>ANSI(gb2312)</strong>环境下，<strong>0xb0-0xf7</strong>,<strong>0xa1-0xfe</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"中文"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$reg = <span class="string">'/['</span>.chr(<span class="number">0xb0</span>).<span class="string">'-'</span>.chr(<span class="number">0xf7</span>).<span class="string">']['</span>.chr(<span class="number">0xa1</span>).<span class="string">'-'</span>.chr(<span class="number">0xfe</span>).<span class="string">']/'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">preg_match($reg,$str,$match);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">var_dump($match);</span></pre></td></tr></table></figure>
+
+<p>UTF-8要使用<strong>u模式修正符</strong>使模式字符串被看成UTF-8，在ANSI(gb2312)环境下，要<strong>使用chr将Ascii转换为字符</strong></p>
+<h4 id="正则表达式真题"><a href="#正则表达式真题" class="headerlink" title="正则表达式真题"></a>正则表达式真题</h4><p>1.至少写出一种验证139开头的11位手机号码的<strong>正则表达式</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"13956565656"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$reg = <span class="string">"/^139\d&#123;8&#125;/"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">preg_match($reg,$str,$match);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">print_r($match);</span></pre></td></tr></table></figure>
+
+<p>2.写出一个正则表达式，取出页面中所有img标签中src的值</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"&lt;img src=\"edit.html\"&gt;"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$reg=<span class="string">'/&lt;img.*?src="(.*?)".*?\/?&gt;/'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">preg_match($reg,$str,$match);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">var_dump($match);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//array(2) &#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//    [0]=&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//  string(21) "&lt;img src="edit.html"&gt;"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//    [1]=&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//  string(9) "edit.html"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//&#125;</span></span></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/php/" rel="tag"><i class="fa fa-tag"></i> php</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/05/30-js%E9%9D%A2%E5%83%8F%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" rel="prev" title="Javascript面向对象编程">
+      <i class="fa fa-chevron-left"></i> Javascript面向对象编程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/07/51-redis%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%93%8D%E4%BD%9C/" rel="next" title="Redis基本类型操作回顾">
+      Redis基本类型操作回顾 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#正则表达式的基本知识点"><span class="nav-number">1.</span> <span class="nav-text">正则表达式的基本知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#正则表达式的作用"><span class="nav-number">1.1.</span> <span class="nav-text">正则表达式的作用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#分隔符"><span class="nav-number">1.2.</span> <span class="nav-text">分隔符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#通用原子"><span class="nav-number">1.3.</span> <span class="nav-text">通用原子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#元字符"><span class="nav-number">1.4.</span> <span class="nav-text">元字符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#模式修正符"><span class="nav-number">1.5.</span> <span class="nav-text">模式修正符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#正则表达式PCRE函数"><span class="nav-number">1.6.</span> <span class="nav-text">正则表达式PCRE函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#后向引用"><span class="nav-number">1.7.</span> <span class="nav-text">后向引用</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#贪婪模式"><span class="nav-number">1.7.1.</span> <span class="nav-text">贪婪模式</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#中文匹配"><span class="nav-number">1.7.2.</span> <span class="nav-text">中文匹配</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#正则表达式真题"><span class="nav-number">2.</span> <span class="nav-text">正则表达式真题</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="事因&amp;emsp;&amp;emsp;最近在上网络编程和Mobile Application Development课程，需要安装 Visual Studio 类的软件开始在相关的网站下载执行程序，运行选择要用的负载工具，安装成功后，建立了第一个Android App(C#)文件可是在运行的时候，死活就是报错缺少SDK，找了很多办法,卸载重装也不能解决。看了一下网上的资料也找到了SDK文件，路径也正确，反正">
+<meta name="keywords" content="计算机基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="因上课安装的软件繁琐，安装虚拟机（win10）来探索">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;03&#x2F;05&#x2F;45-window%E8%99%9A%E6%8B%9F%E6%9C%BA&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="事因&amp;emsp;&amp;emsp;最近在上网络编程和Mobile Application Development课程，需要安装 Visual Studio 类的软件开始在相关的网站下载执行程序，运行选择要用的负载工具，安装成功后，建立了第一个Android App(C#)文件可是在运行的时候，死活就是报错缺少SDK，找了很多办法,卸载重装也不能解决。看了一下网上的资料也找到了SDK文件，路径也正确，反正">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-3.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-4.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-5.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-6.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-7.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-8.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-9.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-10.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-11.png">
+<meta property="og:updated_time" content="2020-05-25T01:41:39.289Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;45-windows-1.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/05/45-window%E8%99%9A%E6%8B%9F%E6%9C%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>因上课安装的软件繁琐，安装虚拟机（win10）来探索 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/05/45-window%E8%99%9A%E6%8B%9F%E6%9C%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          因上课安装的软件繁琐，安装虚拟机（win10）来探索
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-05 00:00:00" itemprop="dateCreated datePublished" datetime="2020-03-05T00:00:00+08:00">2020-03-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-25 09:41:39" itemprop="dateModified" datetime="2020-05-25T09:41:39+08:00">2020-05-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机基础</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/05/45-window%E8%99%9A%E6%8B%9F%E6%9C%BA/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/05/45-window%E8%99%9A%E6%8B%9F%E6%9C%BA/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="事因"><a href="#事因" class="headerlink" title="事因"></a>事因</h4><p>&emsp;&emsp;最近在上网络编程和Mobile Application Development课程，需要安装 Visual Studio 类的软件开始在相关的网站下载执行程序，运行选择要用的负载工具，安装成功后，建立了第一个Android App(C#)文件可是在运行的时候，死活就是报错缺少SDK，找了很多办法,卸载重装也不能解决。看了一下网上的资料也找到了SDK文件，路径也正确，反正就是报错，一气之下，打算下一个window虚拟机打算在里面进行操作，非要解决这个问题，下面将记录下载的过程。希望对你有帮助。</p>
+<a id="more"></a>
+<h4 id="下载Windows10镜像文件"><a href="#下载Windows10镜像文件" class="headerlink" title="下载Windows10镜像文件"></a>下载Windows10镜像文件</h4><p>&emsp;&emsp;有一个MSDN网站里面有许多工具找到对应的工具下载就可以还挺方便。具体看下图。</p>
+<img src="http://xy.liruoning.cn/images/45-windows-1.png" style="zoom:30%;" />
+
+<p>在这里我用的工具是VMware ,对了我这里window的版本选的是教育版，你们也可以选择专业版，我是随便选的因为我只跑个软件就可以了。下面就是创建虚拟机了。</p>
+<h4 id="创建虚拟机"><a href="#创建虚拟机" class="headerlink" title="创建虚拟机"></a>创建虚拟机</h4><p>1、创建虚拟机、选择镜像文件、点击下一步。</p>
+<img src="http://xy.liruoning.cn/images/45-windows-2.png" style="zoom:50%;" />
+
+<p>2、输入密钥、自己的用户名、密码。</p>
+<img src="http://xy.liruoning.cn/images/45-windows-3.png" style="zoom:50%;" />
+
+<p>3、选择虚拟机安装的路径（建议安装在一个固定的路径，不太建议安装在C盘）</p>
+<img src="http://xy.liruoning.cn/images/45-windows-4.png" style="zoom:50%;" />
+
+<p>4、选择磁盘的大小（根据自己的需求来，Windows系统大概需要10G左右的内存，我建议给20GWindow系统因为后期还要升级，然后再估摸着自己的要跑的程序需要多大内存，进行一下分配就可以，我这里给了70G。但是我的截图是81G因为开始我认为反正我又1T的固态，就想分的大一点然后想想用不了那么多，就减少到了70G）如图：</p>
+<img src="http://xy.liruoning.cn/images/45-windows-5.png" style="zoom:60%;" />
+
+<p>5、分配内存空间，这里的话最好不要超过自己的内存空间，超过了可能会发生内存交换，带来不必要的麻烦。我的本机运行内存是16G,然分配了两个内存给虚拟机,在这里以自己的情况而定。</p>
+<img src="http://xy.liruoning.cn/images/45-windows-6.png" style="zoom:60%;" />
+
+<p>6、然后点击完成并安装，等待就可以了，看到这个界面你就完成了基本的安装。你可以在个性化中把我的电脑调出来更方便一点。</p>
+<img src="http://xy.liruoning.cn/images/45-windows-7.png" style="zoom:40%;" />
+
+<h4 id="在虚拟机中安装Visual-Studio-2017"><a href="#在虚拟机中安装Visual-Studio-2017" class="headerlink" title="在虚拟机中安装Visual Studio 2017"></a>在虚拟机中安装Visual Studio 2017</h4><p>1、首先去这个连接下载<a href="https://docs.microsoft.com/en-us/visualstudio/releasenotes/vs2017-relnotes" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/visualstudio/releasenotes/vs2017-relnotes</a> 2017版的Visual Studio这里我为什么不下载2019呢，因为老师的要求，而且老师用的2017这样学起来更方便。下载之后及那个执行软件传输到虚拟机。然后双击。</p>
+<p><img src="http://xy.liruoning.cn/images/45-windows-8.png" alt=""></p>
+<p>2、然后接入工作负载选择界面，看你需要那些工作负载就用给那些点上对勾就可以。然后点击下载就可以。(在这里我引用了老师的截图开始我忘记截了，但是都一样的)</p>
+<p><img src="http://xy.liruoning.cn/images/45-windows-9.png" alt=""></p>
+<p>3、等待安装，安装完成选择主题启动撸代码。</p>
+<img src="http://xy.liruoning.cn/images/45-windows-10.png" style="zoom:50%;" />
+
+<img src="http://xy.liruoning.cn/images/45-windows-11.png" style="zoom:50%;" />
+
+<h4 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h4><p>&emsp;&emsp;在这里简单介绍了一下windows虚拟机的安装，以及visual Studio 软件的安装，其实虚拟机用处有很多，比如说我这次就是，要进行学习安装比要的开发软件，但是我又怕影响，我的主机电脑所以安装了虚拟机（就算是搞坏重新安装心痛发就好了），再就是，有些软件你打算暂时安装用一下，虚拟机是一个不错的选择。</p>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" rel="tag"><i class="fa fa-tag"></i> 计算机基础</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/01/43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE/" rel="prev" title="网络基础HTTP协议的详解">
+      <i class="fa fa-chevron-left"></i> 网络基础HTTP协议的详解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/07/65-mysql%E8%8C%83%E5%BC%8F%E5%92%8C%E5%8F%8D%E8%8C%83%E5%BC%8F/" rel="next" title="数据库的范式和反范式">
+      数据库的范式和反范式 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#事因"><span class="nav-number">1.</span> <span class="nav-text">事因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载Windows10镜像文件"><span class="nav-number">2.</span> <span class="nav-text">下载Windows10镜像文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建虚拟机"><span class="nav-number">3.</span> <span class="nav-text">创建虚拟机</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在虚拟机中安装Visual-Studio-2017"><span class="nav-number">4.</span> <span class="nav-text">在虚拟机中安装Visual Studio 2017</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结言"><span class="nav-number">5.</span> <span class="nav-text">结言</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

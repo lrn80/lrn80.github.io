@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言&amp;emsp;&amp;emsp;说起MySQL的锁机制，一直是一个常见的话题。例如：当客户端操作表的记录时，为了保证数据的隔离性(多个客户端的操作互不影响) ，我们通常使用加锁来处理。或者产生死锁的时候如何排查？都和锁有关。下面我将对MySQL的锁机制展开学习。">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入浅出MySQL的锁机制">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;03&#x2F;11&#x2F;46-mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;说起MySQL的锁机制，一直是一个常见的话题。例如：当客户端操作表的记录时，为了保证数据的隔离性(多个客户端的操作互不影响) ，我们通常使用加锁来处理。或者产生死锁的时候如何排查？都和锁有关。下面我将对MySQL的锁机制展开学习。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;46-mysql-1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;46-mysql-2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;46-mysql-3.png">
+<meta property="og:updated_time" content="2020-05-25T01:41:27.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;46-mysql-1.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/11/46-mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>深入浅出MySQL的锁机制 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/11/46-mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          深入浅出MySQL的锁机制
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-11 00:00:00" itemprop="dateCreated datePublished" datetime="2020-03-11T00:00:00+08:00">2020-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-25 09:41:27" itemprop="dateModified" datetime="2020-05-25T09:41:27+08:00">2020-05-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/11/46-mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/11/46-mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>&emsp;&emsp;说起MySQL的锁机制，一直是一个常见的话题。例如：当客户端操作表的记录时，为了保证数据的隔离性(多个客户端的操作互不影响) ，我们通常使用加锁来处理。或者产生死锁的时候如何排查？都和锁有关。下面我将对MySQL的锁机制展开学习。</p>
+<a id="more"></a>
+
+<h4 id="锁的操作和锁的粒度"><a href="#锁的操作和锁的粒度" class="headerlink" title="锁的操作和锁的粒度"></a>锁的操作和锁的粒度</h4><p><strong>操作</strong></p>
+<ol>
+<li><p>读锁：读操作时要加的锁，也称<strong>共享锁</strong> ，特征是所有人都可以读，只有释放后才可以写。</p>
+</li>
+<li><p>写锁：写操作时加的锁，也称<strong>独占锁</strong>、<strong>排它锁</strong>，只有锁表的客户才能进行读、写操作，其它用户都不能对其修改和读取，更不能加锁。</p>
+</li>
+</ol>
+<p><strong>锁定的粒度</strong></p>
+<ol start="3">
+<li><p>表级锁：开销小、加锁快、发生锁冲突的概率大、并发度最低。</p>
+</li>
+<li><p>页级锁：一次锁定相邻的一组数据，开销和加锁时间位于表锁和行锁之间；会出现死锁；锁定的粒度介于表级锁和行级锁之间，并发度一般。</p>
+</li>
+<li><p>行级锁：开销大，枷锁满，会出现死锁，锁的粒度最小，发生锁冲突的概率低，并发度最高。</p>
+<h4 id="表锁演示"><a href="#表锁演示" class="headerlink" title="表锁演示"></a>表锁演示</h4></li>
+</ol>
+<p><strong>添加锁</strong><br>添加锁语法：<code>lock table table_name1 read|write,table_name2 read|write</code><br>释放锁：<code>unlock tables</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; lock table user read;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Query OK, 0 rows affected (0.00 sec)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from user;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">+----+----------+-----+---------------+---------+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">| id | name     | age | email         | classid |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">+----+----------+-----+---------------+---------+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">|  1 | xiaogang |  12 | gang@sohu.com |       4 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">|  2 | xiaohong |  13 | hong@sohu.com |       2 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">|  3 | xiaolong |  31 | long@sohu.com |       2 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">|  4 | xiaofeng |  22 | feng@sohu.com |       3 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">|  5 | xiaogui  |  42 | gui@sohu.com  |       3 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">+----+----------+-----+---------------+---------+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">5 rows in set (0.00 sec)</span></pre></td></tr></table></figure>
+<p>在上边的命令中我对user表进行了，加读锁的操作。并执行了一条查询语句。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; update user set age&#x3D;21 where id&#x3D;1;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ERROR 1099 (HY000): Table &#39;user&#39; was locked with a READ lock and can&#39;t be updated</span></pre></td></tr></table></figure>
+
+<p>下面我在用<strong>同一账号</strong>进行update操作时便不能操作并且<code>error</code>中也已经说明user表加了read锁不能进行update操作。<br>同样我在<strong>另一个账号</strong>对 user 表进行 update操作时 会进入阻塞状态。如图：<br><img src="http://xy.liruoning.cn/images/46-mysql-1.png" alt=""><br>当执行 <code>unlock tables</code>释放锁另一个进程便可执行update操作<br><img src="http://xy.liruoning.cn/images/46-mysql-2.png" alt=""></p>
+<h4 id="行级锁演示"><a href="#行级锁演示" class="headerlink" title="行级锁演示"></a>行级锁演示</h4><p>&emsp; <strong>InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁</strong>,简而言之：Innodb只有在使用索引条件，检索数据时使用行锁，否则，使用表锁。</p>
+<p><strong>语法</strong></p>
+<p>begin;<br>执行语句；<br>commit; </p>
+<p><img src="http://xy.liruoning.cn/images/46-mysql-3.png" alt=""></p>
+<p>如图所示，当现有的用户对其开启行级的锁时，另一个用户不能对当前的行进行操作，但是可以对同一个表的其它行进行操作。</p>
+<h4 id="PHP代码实现锁机制"><a href="#PHP代码实现锁机制" class="headerlink" title="PHP代码实现锁机制"></a>PHP代码实现锁机制</h4><p>&emsp;&emsp;首先我们创建一个新表来进行测试。</p>
+<p>创建 a 表 并把 a表的id值 更新到100；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; create table a(</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    -&gt; id int not null default &quot;0&quot;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    -&gt; )engine myisam charset utf8;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">Query OK, 0 rows affected, 1 warning (0.03 sec)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">mysql&gt; update a set id &#x3D;100;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">Query OK, 0 rows affected (0.00 sec)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">Rows matched: 0  Changed: 0  Warnings: 0</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from a;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">| id  |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">| 100 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">1 row in set (0.00 sec)</span></pre></td></tr></table></figure>
+
+<p>利用 apache 的 ab.exe 工具，来模仿多个并发测试。</p>
+<p><code>语法:ab.exe  –n 总的请求数  -c 并发数  url地址；</code></p>
+<p>在不加锁的情况下每次的更新数加1。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$pdo = <span class="keyword">new</span> PDO(<span class="string">'mysql:host=localhost;dbname=locktest;port=3308'</span>,<span class="string">'lrn'</span>,<span class="string">'lrn123'</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$res=$pdo-&gt;query(<span class="string">"select * from a"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$info = $res-&gt;fetch(PDO::FETCH_ASSOC);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">$id=$info[<span class="string">'id'</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">$id=$id+<span class="number">1</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">$pdo-&gt;exec(<span class="string">"update a set id=$id"</span>);</span></pre></td></tr></table></figure>
+
+<p>利用ab.exe 工具进行并发请求，请求数为50 并发数 为50 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">D:\www\wamp64\bin\apache\apache2.4.41\bin&gt;ab  -n 50 -c 50 http:&#x2F;&#x2F;localhost&#x2F;test&#x2F;lock.php</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">This is ApacheBench, Version 2.3 &lt;$Revision: 1843412 $&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http:&#x2F;&#x2F;www.zeustech.net&#x2F;</span></pre></td></tr></table></figure>
+<p>查询执行后MySQL的结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from a;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">| id  |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">| 131 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">1 row in set (0.00 sec)</span></pre></td></tr></table></figure>
+<p>最后的结果并未从100 ，变为150，说明有的请求是在同一时间执行的。</p>
+<p>下面我首先将a 表的id值归为 100</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; update a set id &#x3D;100;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Query OK, 1 row affected (0.00 sec)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">Rows matched: 1  Changed: 1  Warnings: 0</span></pre></td></tr></table></figure>
+
+<p>在家锁的情况下执行 ab 工具的并发测试。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$pdo = <span class="keyword">new</span> PDO(<span class="string">'mysql:host=localhost;dbname=locktest;port=3308'</span>,<span class="string">'lrn'</span>,<span class="string">'lrn123'</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$pdo-&gt;exec(<span class="string">"lock table a read"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$res=$pdo-&gt;query(<span class="string">"select * from a"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">$info = $res-&gt;fetch(PDO::FETCH_ASSOC);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">$id=$info[<span class="string">'id'</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">$id=$id+<span class="number">1</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">$pdo-&gt;exec(<span class="string">"update a set id=$id"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">$pdo-&gt;exec(<span class="string">"unlock tables"</span>);</span></pre></td></tr></table></figure>
+
+<p>执行ab.exe </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">D:\www\wamp64\bin\apache\apache2.4.41\bin&gt;ab.exe -n 50 -c 50 http:&#x2F;&#x2F;localhost&#x2F;test&#x2F;lock.php</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">This is ApacheBench, Version 2.3 &lt;$Revision: 1843412 $&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http:&#x2F;&#x2F;www.zeustech.net&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">Licensed to The Apache Software Foundation, http:&#x2F;&#x2F;www.apache.org&#x2F;</span></pre></td></tr></table></figure>
+<p>执行完之后，进行a表id的查询。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; select id from a;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">| id  |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">| 150 |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">1 row in set (0.00 sec)</span></pre></td></tr></table></figure>
+
+<p>由上面的数据我们可以看出，在加锁和不加锁的在并发情况下，数据的准确性。</p>
+<p><strong>引申：</strong></p>
+<p>&emsp;&emsp;在MySQL的锁机制中，对一个商品表进行写操作，如果锁定了整张表，其它的用户也不能对数据表进行读、写，进而拖垮整个页面的速度。</p>
+<p>&emsp;&emsp;所以我们可以使用PHP的文件锁，对某一段的代码进行加锁操作这样便可以避免锁定数据库表了。</p>
+<p>使用到PHP的<code>flock</code>函数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$pdo  = <span class="keyword">new</span> PDO(<span class="string">'mysql:host=localhost;dbname=locktest;port=3308'</span>,<span class="string">'lrn'</span>,<span class="string">'lrn123'</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$pdo-&gt;exec(<span class="string">'set names utf8'</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$fh = fopen(<span class="string">'./lock.txt'</span>,<span class="string">'w'</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">flock($fh,LOCK_EX);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//取出id的值</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">$res = $pdo-&gt;query(<span class="string">'select id from a'</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">$info = $res-&gt;fetch(PDO::FETCH_ASSOC);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">$id = $info[<span class="string">'id'</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//给id的值加1操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">$id = $id+<span class="number">1</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//把该值再写入；</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">$pdo-&gt;exec(<span class="string">"update a set id=$id"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">flock($fh,LOCK_UN);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> <span class="string">'ok'</span>;</span></pre></td></tr></table></figure>
+
+<p>对其使用ab.exe 并发测试 一样可以完成完整的操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; select id from a;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">| id  |</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">| 200 |                    &#x2F;&#x2F;在原来150的情况下，加了50</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">+-----+</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">1 row in set (0.00 sec)</span></pre></td></tr></table></figure>
+
+<h4 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h4><p>&emsp;&emsp;乐观锁顾名思义就是在好的情况下，来看待问题。它会认为不会产生并发问题，因此不会上锁，如果有更新操作会判断其它的线程有没有进行过修改，一般通过<strong>版本号机制</strong> 。</p>
+<p><strong>实现步骤：</strong></p>
+<p><strong>版本号机制</strong></p>
+<p>①在数据库表中设立<code>version</code>字段</p>
+<p>②再取数据的时候将<code>version</code>字段的数据取出</p>
+<p>③在更新数据的时候先判断<code>version</code>的值和数据库的值是否相等，如果不相等则说明数据库发生了修改则更新失败。如果相等除了要修改的字段 <code>version</code>字段<code>+1</code> 。</p>
+<p>实现语句：</p>
+<p><code>update user set name=&quot;xiaowang&quot; ,version=version+1 where id={id},version={version} ;</code></p>
+<p>相应的乐观锁是通过程序控制的，则也就不存在死锁的概念。</p>
+<h4 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h4><p>&emsp;&emsp;与乐观锁相对应的就是悲观锁，顾名思义悲观锁认为每次操作都会有数据冲突，所以每一次的操作都会获取锁才会进行相同数据的操作。进而悲观锁耗费较多的时间，另外，悲观锁是有数据库进行实现的，要用时执行相关的语句。数据表的，共享锁、排它锁，都是属于悲观锁的范畴。</p>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/09/15-php%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="prev" title="PHP实现两个O(nlog n)级别的排序算法（归并排序、快速排序）">
+      <i class="fa fa-chevron-left"></i> PHP实现两个O(nlog n)级别的排序算法（归并排序、快速排序）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/15/47-mysql%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%88%86%E5%8C%BA%E5%88%86%E8%A1%A8/" rel="next" title="MySQL分区分表技术">
+      MySQL分区分表技术 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#锁的操作和锁的粒度"><span class="nav-number">2.</span> <span class="nav-text">锁的操作和锁的粒度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#表锁演示"><span class="nav-number">3.</span> <span class="nav-text">表锁演示</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#行级锁演示"><span class="nav-number">4.</span> <span class="nav-text">行级锁演示</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP代码实现锁机制"><span class="nav-number">5.</span> <span class="nav-text">PHP代码实现锁机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#乐观锁"><span class="nav-number">6.</span> <span class="nav-text">乐观锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#悲观锁"><span class="nav-number">7.</span> <span class="nav-text">悲观锁</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

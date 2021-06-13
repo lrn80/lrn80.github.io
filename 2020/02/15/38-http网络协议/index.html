@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言&amp;emsp;&amp;emsp;在这篇blog中讲述了http的状态码，常见状态码代表什么意思，OSI七层模型各自的工作，http的工作原理，常见的请求方法，常见的网络协议的端口号等内容。">
+<meta name="keywords" content="http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP网络协议基本知识点">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;15&#x2F;38-http%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;在这篇blog中讲述了http的状态码，常见状态码代表什么意思，OSI七层模型各自的工作，http的工作原理，常见的请求方法，常见的网络协议的端口号等内容。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-29T11:18:14.559Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/15/38-http%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>HTTP网络协议基本知识点 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/15/38-http%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          HTTP网络协议基本知识点
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-15 00:00:00" itemprop="dateCreated datePublished" datetime="2020-02-15T00:00:00+08:00">2020-02-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-29 19:18:14" itemprop="dateModified" datetime="2020-02-29T19:18:14+08:00">2020-02-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP/" itemprop="url" rel="index">
+                    <span itemprop="name">HTTP</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/02/15/38-http%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/15/38-http%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>&emsp;&emsp;在这篇blog中讲述了http的状态码，常见状态码代表什么意思，OSI七层模型各自的工作，http的工作原理，常见的请求方法，常见的网络协议的端口号等内容。</p>
+<a id="more"></a>
+
+<h4 id="HTTP状态码"><a href="#HTTP状态码" class="headerlink" title="HTTP状态码"></a>HTTP状态码</h4><p><strong>状态码五大类：</strong></p>
+<ol>
+<li>1XX 表示接收的请求正在处理</li>
+<li>2XX 表示请求正常处理完毕</li>
+<li>3XX  表示重定向(客户端需要附加操作才可以完成重启)</li>
+<li>4XX  客户端错误</li>
+<li>5XX  服务器端错误</li>
+</ol>
+<p><strong>常见的状态码：</strong></p>
+<ol>
+<li><p>2XX</p>
+<p>200  代表的是 OK</p>
+<p>204  服务器的响应已经<strong>成功</strong>处理，在<strong>实体报文</strong>中<strong>不含</strong>响应<strong>内容</strong></p>
+</li>
+</ol>
+<p>​    206 表示服务器端已经处理了部分的GET请求。</p>
+<ol>
+<li><p>3XX</p>
+<p>301  表示永久的重定向</p>
+<p>302  临时的重定向(返回的页面告诉浏览器到另外一个url取资源)</p>
+<p>303  请求的资源存在另一个URL应使用请求定向请求对应的URL</p>
+<p>304  客户端发送附带条件的请求资源的时候服务器端允许请求资源，但因满足请求。未发生，服务端直接返回304。</p>
+<p>307  临时重定向</p>
+</li>
+<li><p>4XX</p>
+<p>400  客户端的错误（请求报文中存在语法错误）</p>
+<p>401  发送的请求要有HTTP认证的认证信息</p>
+<p>403   禁止访问, 即告诉浏览器，你没有权限访问该资源</p>
+<p>404  not found  没有该资源.</p>
+</li>
+</ol>
+<ol start="4">
+<li><p>5XX </p>
+<p>500 服务器端的错误</p>
+<p>503  正在处于超负载、服务器在停机维护</p>
+</li>
+</ol>
+<h4 id="OSI七层模型"><a href="#OSI七层模型" class="headerlink" title="OSI七层模型"></a>OSI七层模型</h4><ol>
+<li>应用层 ：为应用程序提供服务并管理程序之间的通信’SMTP、FTP、HTTP等协议</li>
+<li>表示层 ：数据的格式转换、加密解密、压缩解压</li>
+<li>会话层 :  建立管理和断开通信链接，实现数据同步</li>
+<li>传输层 :  为数据提供可靠和不可靠的端到端传输，TCP,UDP协议属于这一层 </li>
+<li>网络层 ：负责地址管理、路由选择和拥塞控制，该层最知名的是IP协议</li>
+<li>数据链路层：将数据分割成帧，负责MAC地址的<strong>寻址</strong>、<strong>差错效验</strong>和<strong>信息纠正</strong>，<strong>以太网</strong>属于这一层</li>
+<li>物理层 ：管理最基础的传输通道，建立物理连接，并提供物理链路所需的机械电器功能和过程等特性</li>
+</ol>
+<h4 id="HTTP协议的特点"><a href="#HTTP协议的特点" class="headerlink" title="HTTP协议的特点"></a>HTTP协议的特点</h4><ol>
+<li>基于B/S模型</li>
+<li>通信开销小、简单快速、传输成本低</li>
+<li>使用灵活、可使用超文本<strong>传输协议</strong></li>
+<li>节省传输时间</li>
+<li>无状态</li>
+</ol>
+<h4 id="HTTP工作原理"><a href="#HTTP工作原理" class="headerlink" title="HTTP工作原理"></a>HTTP工作原理</h4><p>客户端发送请求给服务器，这时候创建一个TCP连接，指定端口，连接服务器。</p>
+<p>服务器端监听客户端的请求，一但监听到请求信息，就会分析请求内容然后，响应相应的状态和数据内容。</p>
+<h4 id="HTTP常见的响应头"><a href="#HTTP常见的响应头" class="headerlink" title="HTTP常见的响应头"></a>HTTP常见的响应头</h4><p>Content-Type：<strong>内容</strong>的MIME类型（text/html）</p>
+<p>Accept:<strong>可接受</strong>的MIME类型(image/png,image/gif;q=0.8)</p>
+<p>Origin:最初的请求来源于哪里，主要用于Post请求</p>
+<p>Cookie: HTTP发起时发送给服务端Cookie的值。</p>
+<p>Cache-Control: 指定请求和响应的缓存机制</p>
+<p>User-Agent:用户的代理信息，列入操作系统，浏览器的名称和版本等。（Mozilla/5.0(iPhone; CPU iPhone OS 9_1 like Mac OS X)）</p>
+<p>Referrer(Referer):上一个页面的地址(<a href="https://www.lrnjy.club" target="_blank" rel="noopener">https://www.lrnjy.club</a>)</p>
+<p>X-Forworded-For:  请求端真实的IP</p>
+<p>Access-Control-Allow-Origin:跨域的时候用允许特定域名的请求。</p>
+<p>Last-Modified: 最后的响应时间。</p>
+<h4 id="HTTP协议的请求方法"><a href="#HTTP协议的请求方法" class="headerlink" title="HTTP协议的请求方法"></a>HTTP协议的请求方法</h4><ol>
+<li><strong>GET:</strong> 请求主要用于查询操作(对数据的读取)的请求是<code>幂等的</code></li>
+<li><strong>HEAD:</strong><code>HEAD</code>方法与<code>GET</code>方法一样，都是向服务器发出指定资源的请求。但是，服务器在响应<code>HEAD</code>请求时不会回传资源的内容部分(响应主体）。这样，我们可以不传输全部内容的情况下，就可以获取服务器的响应头信息。<code>HEAD</code>方法常被用于客户端查看服务器的性能。</li>
+<li><strong>OPTIONS:</strong> <code>OPTIONS</code>请求与<code>HEAD</code>类似，一般也是用于客户端查看服务器的性能。 这个方法会请求服务器返回该资源所支持的所有HTTP请求方法，该方法会用’*’来代替资源名称，向服务器发送<code>OPTIONS</code>请求，可以测试服务器功能是否正常。JavaScript的<a href="http://itbilu.com/javascript/js/VkiXuUcC.html" target="_blank" rel="noopener">XMLHttpRequest</a>对象进行<code>CORS</code>跨域资源共享时，就是使用<code>OPTIONS</code>方法发送嗅探请求，以判断是否有对指定资源的访问权限</li>
+<li><strong>POST：</strong>对于指定的资源提交数据，请求服务器进行处理。如：表单的提交，文件的上传，POST可能会对资源修改或者创建所以是<code>非幂等的</code></li>
+<li><strong>PUT:</strong><code>PUT</code>请求会向指定资源位置上传其最新内容，<code>PUT</code>方法是<code>幂等</code>的方法。通过该方法客户端可以将指定资源的最新数据传送给服务器取代指定的资源的内容。</li>
+<li><strong>DELETE:</strong><code>DELETE</code>请求用于请求服务器删除所请求<code>URI</code>（统一资源标识符，Uniform Resource Identifier）所标识的资源。<code>DELETE</code>请求后指定资源会被删除，<code>DELETE</code>方法也是<code>幂等</code>的。</li>
+<li><strong>TRACE</strong>:<code>TRACE</code>请求服务器回显其收到的请求信息，该方法主要用于HTTP请求的测试或诊断。</li>
+</ol>
+<h5 id="GET和POST区别"><a href="#GET和POST区别" class="headerlink" title="GET和POST区别"></a>GET和POST区别</h5><ol>
+<li><strong>后退按钮刷新：</strong> GET在浏览器选择后退按钮时<strong>无害</strong>，POST则会<strong>重新提交表单</strong></li>
+<li><strong>书签:</strong> GET可以<strong>被收藏</strong>为<strong>书签</strong>，POST<strong>不可能被收藏为书签</strong>。</li>
+<li><strong>浏览器缓存：</strong>GET请求可以被<strong>浏览器缓存</strong>，POST<strong>不会被浏览器缓存</strong>。</li>
+<li><strong>编码类型：</strong> GET application/x-www-form-urlencoded , POST application/x-www-form-urlencoded 或 multipart/form-data。为二进制数据使用多重编码。</li>
+<li><strong>历史记录：</strong> GET　参数保留在浏览器历史记录中，ＰＯＳＴ参数不会保留到历史记录中</li>
+<li><strong>请求数据的长度</strong>：GET发送数据时，请求的URL在地址栏中，有长度的限制，（最大长度2048和字符） ，POST则不会有限制</li>
+<li><strong>对数据类型的限制</strong>：GET只允许ASCll字符，POST无限制也允许二进制</li>
+<li><strong>安全性</strong>：POST比GET更安全，因为GET请求的参数直接暴露在URL中所以一些比较敏感的信息就不要让GET来传输！</li>
+<li><strong>可见性</strong>：GET 数据在url中是可见的， POST不可见。</li>
+</ol>
+<h4 id="HTTPS的工作原理"><a href="#HTTPS的工作原理" class="headerlink" title="HTTPS的工作原理"></a>HTTPS的工作原理</h4><ol>
+<li>HTTS是基于SSL/TLS的HTTP协议，所有的HTTP数据都是在SSL/TLS协议的封装之上传输的。</li>
+<li>HTTPS协议在HTTP协议的基础上，添加了SSL/TLS握手以及数据的加密传输，也属于应用层。</li>
+</ol>
+<h4 id="常见的网络协议"><a href="#常见的网络协议" class="headerlink" title="常见的网络协议"></a>常见的网络协议</h4><ol>
+<li>FTP:文件传输协议 （21端口）</li>
+<li>Telnet: 用户远程登陆的端口，通过这个协议用户可以以一种基于DOC下的服务。（23端口）</li>
+<li>SMTP:简单邮件的传输协议(25端口)</li>
+<li>POP3:接收电子邮件（110端口）</li>
+<li>HTTP:超文本传输协议。（80端口）</li>
+<li>DNS:域名解析协议（53端口）</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/http/" rel="tag"><i class="fa fa-tag"></i> http</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/14/39-php%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83&%E9%85%8D%E7%BD%AE/" rel="prev" title="php开发环境&配置">
+      <i class="fa fa-chevron-left"></i> php开发环境&配置
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/16/%E9%93%BE%E8%A1%A8%E7%9A%84%E5%9F%BA%E7%A1%80/" rel="next" title="PHP实现链表">
+      PHP实现链表 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP状态码"><span class="nav-number">2.</span> <span class="nav-text">HTTP状态码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OSI七层模型"><span class="nav-number">3.</span> <span class="nav-text">OSI七层模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP协议的特点"><span class="nav-number">4.</span> <span class="nav-text">HTTP协议的特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP工作原理"><span class="nav-number">5.</span> <span class="nav-text">HTTP工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP常见的响应头"><span class="nav-number">6.</span> <span class="nav-text">HTTP常见的响应头</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP协议的请求方法"><span class="nav-number">7.</span> <span class="nav-text">HTTP协议的请求方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#GET和POST区别"><span class="nav-number">7.1.</span> <span class="nav-text">GET和POST区别</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTPS的工作原理"><span class="nav-number">8.</span> <span class="nav-text">HTTPS的工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常见的网络协议"><span class="nav-number">9.</span> <span class="nav-text">常见的网络协议</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

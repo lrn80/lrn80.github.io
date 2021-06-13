@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="背景&amp;emsp;&amp;emsp;在这篇博文之前我已经发表过一次有关http协议的博文，在哪篇博文中主要是对http内容的概述，今天这篇博文主要记录了HTTP是如何建立连接的呀。HTTP的响应头，和请求头参数的含义，以及HTTPS是一种构建在SSL或者TLS上的HTTP协议、对称和非对称加密。">
+<meta name="keywords" content="http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络基础HTTP协议的详解">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;03&#x2F;01&#x2F;43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="背景&amp;emsp;&amp;emsp;在这篇博文之前我已经发表过一次有关http协议的博文，在哪篇博文中主要是对http内容的概述，今天这篇博文主要记录了HTTP是如何建立连接的呀。HTTP的响应头，和请求头参数的含义，以及HTTPS是一种构建在SSL或者TLS上的HTTP协议、对称和非对称加密。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-3.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-5.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-4.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-6.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-7.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-8.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-9.png">
+<meta property="og:updated_time" content="2020-05-25T01:41:35.930Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;43-http-1.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/01/43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>网络基础HTTP协议的详解 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/01/43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          网络基础HTTP协议的详解
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-01 00:00:00" itemprop="dateCreated datePublished" datetime="2020-03-01T00:00:00+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-25 09:41:35" itemprop="dateModified" datetime="2020-05-25T09:41:35+08:00">2020-05-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP/" itemprop="url" rel="index">
+                    <span itemprop="name">HTTP</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/01/43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/01/43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>&emsp;&emsp;在这篇博文之前我已经发表过一次有关http协议的博文，在哪篇博文中主要是对http内容的概述，今天这篇博文主要记录了HTTP是如何建立连接的呀。HTTP的响应头，和请求头参数的含义，以及HTTPS是一种构建在SSL或者TLS上的HTTP协议、对称和非对称加密。</p>
+<a id="more"></a>
+<h4 id="URI（统一资源标识符）"><a href="#URI（统一资源标识符）" class="headerlink" title="URI（统一资源标识符）"></a>URI（统一资源标识符）</h4><p>URI和URL的区别</p>
+<p>①URI 统一资源标识符，在某一规则下能把资源独一无二的标识出来，在这里简单举一个例子，以人为例，在世界上我们人的标识符可以用<strong>身份证号码</strong>来做比喻，因为通过身份证号码可以确定唯一一个人。<br>②URL 统一资源定位符，这里还以人为例动物住址协议://地球/中国/浙江省/杭州市/西湖区/某大学/14号宿舍楼/525号寝/张三.人 可以看到，我们通过描述一个人的位置，也定位到了张三这个人。所以URL是URI的一个子集。</p>
+<p>URL 是以描述人的位置来唯一确定一个人的。在上文我们用身份证号也可以唯一确定一个人。对于这个在杭州的张三，我们也可以用：身份证号：<a href="tel:123456789" target="_blank" rel="noopener">123456789</a>来标识他。<br>所以不论是用定位的方式还是用编号的方式，我们都可以唯一确定一个人，都是URl的一种实现，而URL就是用定位的方式实现的URI</p>
+<blockquote>
+<p>参考链接：<br>作者：daixinye<br>链接：<a href="https://www.zhihu.com/question/21950864/answer/154309494" target="_blank" rel="noopener">https://www.zhihu.com/question/21950864/answer/154309494</a></p>
+</blockquote>
+<p>下面是URL的格式，对于每一部分添加了讲解。</p>
+<p><code>http://easy:good@ftqq.com:80/videolist.php?type=selected#network</code></p>
+<p><code>http://</code> (scheme)协议的标识，如http、ftp、file、mailto(后面直接<code>:</code>不需要双斜杠的)</p>
+<p><code>easy:good</code> (user:password)用户名和密码：可选项</p>
+<p><code>ftqq.com</code> (host): 主机资源所在的服务器，域名或者IP都可以</p>
+<p><code>80</code> (port) 服务器正在监听的网络端口</p>
+<p><code>videolist.php</code> (path)资源路径，资源在服务器中的位置 </p>
+<p><code>type=selectes</code> (query) 查询参数，GET请求就用它传参</p>
+<p><code>#network</code> (fragment) 锚点，一般用于页面中的段 。如果加上了这个锚点，他不但可以定位到相应的段，也可以定位到锚点相应的位置。</p>
+<h4 id="HTTP超文本传输协议"><a href="#HTTP超文本传输协议" class="headerlink" title="HTTP超文本传输协议"></a>HTTP超文本传输协议</h4><h5 id="HTTP指定资源的方式"><a href="#HTTP指定资源的方式" class="headerlink" title="HTTP指定资源的方式"></a>HTTP指定资源的方式</h5><p>①在地址中指定 <code>https://www.lrnjy.club/123.html</code> 就属于在地址中指定资源</p>
+<p>②在请求数据中指定资源 <code>https://www.lrmjy.club?page=1</code> 属于使用请求数据指定资源</p>
+<h5 id="HTTP请求报文和应答报文"><a href="#HTTP请求报文和应答报文" class="headerlink" title="HTTP请求报文和应答报文"></a>HTTP请求报文和应答报文</h5><p><img src="http://xy.liruoning.cn/images/43-http-1.png" alt=""></p>
+<p><strong>请求和应答报文的实例</strong></p>
+<p><img src="http://xy.liruoning.cn/images/43-http-2.png" alt=""></p>
+<h5 id="HTTP协议的三大特征"><a href="#HTTP协议的三大特征" class="headerlink" title="HTTP协议的三大特征"></a>HTTP协议的三大特征</h5><p><strong>持久连接 keep-alive</strong></p>
+<p>&emsp;&emsp;在早期的http中，一次http的连接完成后就会断开连接，下一次再重新连接，在那时请求资源的数据并不多，在大多情况下也不会造成大问题。但是随着HTTP的普及，请求的资源越来越庞大，一个HTML文档要包含多个CSS、JS文件甚至有图片和视频资源。如果还按照老式的http请求方式，将会造成巨大的网络通信开销。</p>
+<p>&emsp;&emsp;为了解决上面的问题，提出了持久连接，只要通信的两端的任意一端，没有明确提出断开，那么http就请求便一直保持连接状态，以便于下一次通信复用该连接，进而避免了重复连接带来的开销，加速了页面的呈现。</p>
+<p><img src="http://xy.liruoning.cn/images/43-http-3.png" alt=""></p>
+<p><strong>管道化</strong></p>
+<p>&emsp;&emsp;管大化是建立在持久连接上的进一步性能的优化。过去,要按照先进先出的顺序，也就是发送完请求，要等待并接受的到响应，才能再继续下一个请求。启用管道化之后，就会将队列顺序迁移到服务器，这样就能同时发送多个请求，然后服务器再按照顺序一个一个的响应。</p>
+<p>&emsp;&emsp;在HTTP请求管道话的的过程中，就好比超市的收银台一样，在发送请求过程中不需要等待服务器对前一个请求的响应完成后在发送下一个请求。只不过在客户端接收响应的时候，要按照发送请求的顺序来接收响应，如果前一个请求非常的磨蹭，那么后面的请求也会受到影响（就和超市排队结算一样如果前面的人很磨蹭这样也就会影响后面排队的人，所以在每次排队的时候你不知道是顾客磨蹭还是收银员磨蹭，最后就会产生<strong>队首阻塞的想象</strong>）。当然，你也可以再选好队伍的时候选一个最快的队伍，或者另外开辟一个队，一旦选好队伍就不能更换队伍了，如果另起队伍，就会出现资源的耗费和性能的损失，这种另起新队伍的方式只在新队伍 数量很少的情况下有作用，因此它并不具备可扩展性。</p>
+<blockquote>
+<p>参考链接：<a href="https://blog.csdn.net/qq_28885149/article/details/52922107" target="_blank" rel="noopener">https://blog.csdn.net/qq_28885149/article/details/52922107</a></p>
+</blockquote>
+<p>&emsp;&emsp;而对于<strong>队首阻塞问题</strong>，在HTTP2.0不但队首阻塞问题得到了解决，还将TCP建立连接的次数降至到了一次，通讯的两端将消息分解为独立的帧，然后多条数据流乱序发送，最后在接收数据端把帧重新组合成消息，并且各条的消息组合互不干扰，这就实现了真正意义上的并行通信，达到了多路复用的效果。</p>
+<p><strong>无状态</strong></p>
+<p>&emsp;&emsp;HTTP协议是一种无状态的协议，每一个请求和响应是一一对应的，不会出现多个请求复用一个响应，即使在同一个连接之间也没有。</p>
+<h5 id="http内容协商"><a href="#http内容协商" class="headerlink" title="http内容协商"></a>http内容协商</h5><p>&emsp;&emsp;以Accept开头的都是进行内容协商的，比如在请求头里面<code>Accept-Encoding:gzip</code>,<code>Accept-Language:zh-CN</code> ,<code>Accept-Charset:UTF-8</code> 这些内容时，是和服务器进行协商，客户端最希望要UTF-8字符集的中文文档，最好用Gzip来压缩。如果服务器端有这些资料就会准备相应的内容<code>Content-Encoding:gzip</code>，<code>Content-Language:zh-CN</code>,<code>Content-Charset:UTF-8</code> </p>
+<p>如图：</p>
+<p><img src="http://xy.liruoning.cn/images/43-http-5.png" alt=""></p>
+<h5 id="部分内容的获取"><a href="#部分内容的获取" class="headerlink" title="部分内容的获取"></a>部分内容的获取</h5><p>&emsp;&emsp;有的时候服务器不需要获取全部的内容，通过<code>GET/a.png Rang:bytes=1001-2000</code> 这时候服务器知道你需要<code>a.png</code> 的1001-2000的资源，这时候服务器就会返回 <code>HTTP/1.1 206 Partial Content</code> 206的状态码 并说明返回了部分的数据以及<code>Content-Length:1000</code> <code>Content-Range:bytes1001-2000/2000</code>。 </p>
+<p>如图：</p>
+<p><img src="http://xy.liruoning.cn/images/43-http-4.png" alt=""></p>
+<h5 id="按条件获取内容"><a href="#按条件获取内容" class="headerlink" title="按条件获取内容"></a>按条件获取内容</h5><p>&emsp;&emsp;当客户端向服务端获取一个带条件的请求时，如果不符合条件则返回修改后的页面信息，并带上修改的时间，如果没有修改直接返回304 Not Modified。</p>
+<p>如图：</p>
+<p><img src="http://xy.liruoning.cn/images/43-http-6.png" alt=""></p>
+<h5 id="Basic认证"><a href="#Basic认证" class="headerlink" title="Basic认证"></a>Basic认证</h5><p>&emsp;&emsp;一般的话我们的cookie客户端是可以进行编码伪造的，即使是Client2也可以伪造Clinet1的cookie进行登录，所以一般的cookie用在对安全性没有那么高要求的，对于无关紧要的偏好上边。所以我们提供了一种认证机制Basic认证，如果用户请求的页面刚好时要进行认证的服务端会返回401的状态码，告诉客户端这个页面需要认证，认证的方式时Basic同时以realm告知认证的范围。同时客户端会回复一个以Base64 编码的<code>username：password</code>的信息来进行验证 authorization的头。</p>
+<p>如图：</p>
+<p><img src="http://xy.liruoning.cn/images/43-http-7.png" alt=""></p>
+<h4 id="HTTPS协议以及加密"><a href="#HTTPS协议以及加密" class="headerlink" title="HTTPS协议以及加密"></a>HTTPS协议以及加密</h4><p>&emsp;&emsp;由于现在的网络越来越发达，个人的信息安全也被我们所重视，由于http的传输是在网络中进行明文传输的这样就有可能，让不法分子窃取我们的信息，所以就产生了https（Secure），安全的HTTP协议，进而为网络通信提供来源认证、数据加密和报文完整性检测，以保证通信的保密性和可靠性。</p>
+<p>&emsp;&emsp;之所以说HTTP协议不安全其中是有以下三个原因导致的。</p>
+<ol>
+<li>数据以明文的形式传输，有被窃听的风险。</li>
+<li>接收时的报文无法证明时发送的报文，有可能在网络中已经被篡改，不能保证请求的数据的完整性。</li>
+<li>不能验证通信双方的身份，可能是一个伪造的请求<h5 id="加密"><a href="#加密" class="headerlink" title="加密"></a>加密</h5>&emsp;&emsp;在密码学中，加密就是将明文转换成难以理解的密文；解密与之相反将密文转换成明文。加密和解密由两部分组成：算法和密钥。加密算法可以分为两类：对称加密和非对称加密。</li>
+</ol>
+<p><strong>对称加密</strong><br>&emsp;&emsp; 对称加密是在加密和解密的过程使用同一个密钥，对称加密的优点就是速度快，但缺点也是可想而知在因为密钥是共享的在客户端和服务端进行会话之前，要先将对称密钥发给对方，在密钥传输过程中有被窃听的风险，当密钥被窃听，那么密钥很容易被轻松翻译成明文，加密保护形同虚设（就是和没有加密效果一样）。</p>
+<p><img src="http://xy.liruoning.cn/images/43-http-8.png" alt=""></p>
+<p><strong>非对称加密</strong></p>
+<p>&emsp;&emsp; 非对称加密在加密过程中使用公钥，在加密过程中使用私钥。也就是说加密和解密并不是同一把钥匙，但是是同<strong>一组</strong>钥匙。在加密和解密过程中，解密方将自己的公钥发送给加密方，在加密方将数据使用公钥加密完成之后，在响应给解密方，解密方使用私钥进行解密。在这个过程中即使公钥被泄露了，数据也不能用公钥进行解密所以数据传输过去之后拥有私钥的一方才可以进行解密，这样就不怕在传输中密钥被窃取了。</p>
+<p><img src="http://xy.liruoning.cn/images/43-http-9.png" alt=""></p>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/http/" rel="tag"><i class="fa fa-tag"></i> http</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/27/14-php%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="prev" title="PHP实现三个O(n*n)级别的排序算法（选择排序、冒泡排序、插入排序）">
+      <i class="fa fa-chevron-left"></i> PHP实现三个O(n*n)级别的排序算法（选择排序、冒泡排序、插入排序）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/05/45-window%E8%99%9A%E6%8B%9F%E6%9C%BA/" rel="next" title="因上课安装的软件繁琐，安装虚拟机（win10）来探索">
+      因上课安装的软件繁琐，安装虚拟机（win10）来探索 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#URI（统一资源标识符）"><span class="nav-number">2.</span> <span class="nav-text">URI（统一资源标识符）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP超文本传输协议"><span class="nav-number">3.</span> <span class="nav-text">HTTP超文本传输协议</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#HTTP指定资源的方式"><span class="nav-number">3.1.</span> <span class="nav-text">HTTP指定资源的方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HTTP请求报文和应答报文"><span class="nav-number">3.2.</span> <span class="nav-text">HTTP请求报文和应答报文</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HTTP协议的三大特征"><span class="nav-number">3.3.</span> <span class="nav-text">HTTP协议的三大特征</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#http内容协商"><span class="nav-number">3.4.</span> <span class="nav-text">http内容协商</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#部分内容的获取"><span class="nav-number">3.5.</span> <span class="nav-text">部分内容的获取</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#按条件获取内容"><span class="nav-number">3.6.</span> <span class="nav-text">按条件获取内容</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Basic认证"><span class="nav-number">3.7.</span> <span class="nav-text">Basic认证</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTPS协议以及加密"><span class="nav-number">4.</span> <span class="nav-text">HTTPS协议以及加密</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#加密"><span class="nav-number">4.1.</span> <span class="nav-text">加密</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

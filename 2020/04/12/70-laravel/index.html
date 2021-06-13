@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="什么是路由&amp;emsp;&amp;emsp;当学一个框架的时候路由肯定是必须要掌握的，首先路由的概念，当访问一个链接地址时，它会找到路由，然后由路由找到控制器，控制器会找到数据模型，数据模型返回数据到控制器，将数据渲染到视图。">
+<meta name="keywords" content="laravel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="走进laravel经典操作">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;04&#x2F;12&#x2F;70-laravel&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="什么是路由&amp;emsp;&amp;emsp;当学一个框架的时候路由肯定是必须要掌握的，首先路由的概念，当访问一个链接地址时，它会找到路由，然后由路由找到控制器，控制器会找到数据模型，数据模型返回数据到控制器，将数据渲染到视图。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-04-15T12:41:17.375Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/12/70-laravel/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>走进laravel经典操作 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/12/70-laravel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          走进laravel经典操作
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-12 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-12T00:00:00+08:00">2020-04-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-15 20:41:17" itemprop="dateModified" datetime="2020-04-15T20:41:17+08:00">2020-04-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Laravel/" itemprop="url" rel="index">
+                    <span itemprop="name">Laravel</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/12/70-laravel/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/12/70-laravel/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="什么是路由"><a href="#什么是路由" class="headerlink" title="什么是路由"></a>什么是路由</h4><p>&emsp;&emsp;当学一个框架的时候路由肯定是必须要掌握的，首先路由的概念，当访问一个链接地址时，它会找到路由，然后由路由找到控制器，控制器会找到数据模型，数据模型返回数据到控制器，将数据渲染到视图。</p>
+<a id="more"></a>
+<p><strong>laravel中定义路由</strong></p>
+<p>首先定义一个静态路由：</p>
+<ol>
+<li>定义在routes/web.php的目录中</li>
+</ol>
+<p>简单示例：如下所示路由是在闭包中完成的逻辑，那么如何让路由关联到控制器，在控制器完成相应的逻辑呢？下面路由关联控制器将会讲到。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Route::get(<span class="string">'/hello'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> <span class="string">"hello word"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">&#125;);</span></pre></td></tr></table></figure>
+
+<p><strong>路由关联控制器</strong></p>
+<p>控制器的作用：</p>
+<ol>
+<li>扩展路由闭包中的逻辑，将逻辑在控制器中完成。 </li>
+<li>让控制器来做表单验证等前置操作。</li>
+<li>配合Model处理数据</li>
+</ol>
+<p><strong>控制器的创建</strong></p>
+<p><code>php artisan make:controller HelloController</code> 使用 <code>artisan</code> 进行控制器的创建</p>
+<p>那么如何让我的路由找到控制器呢？</p>
+<p>我们只需要在：<code>controllerName@functionName</code> 的语法就可以找到相应的控制器了。</p>
+<p>如下图所示便能找到 <code>HelloController</code>控制器了。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Route::get(<span class="string">'/hello'</span>, <span class="string">'HelloController@hello'</span>);</span></pre></td></tr></table></figure>
+
+<p>这个命名的默认空间是在 <code>App\Http\Controller</code> 目录下的。<code>HelloController@hello</code>和<code>App\Http\Controller\HelloController@hello</code>是等价的。</p>
+<h4 id="获取请求参数"><a href="#获取请求参数" class="headerlink" title="获取请求参数"></a>获取请求参数</h4><ol>
+<li><p>关于如何获取请求参数，在<code>Route</code>中使用<code>{value}</code>格式规定<strong>必传</strong>的参数。</p>
+<p>如下便可绑定一个参数了。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Route::get(<span class="string">'/hello/&#123;name&#125;'</span>, <span class="string">'HelloController@sayhello'</span>);</span></pre></td></tr></table></figure>
+</li>
+<li><p>上边是定义的必传参数，那么如何定义选传参数呢？直接在<code>{name?}</code>下加一个问号即可;</p>
+<p>如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Route::get(<span class="string">'/hello/&#123;name&#125;/&#123;sex?&#125;'</span>, <span class="string">'HelloController@sayhello'</span>);</span></pre></td></tr></table></figure>
+</li>
+<li><p>上面的请求方式是使用<code>GET</code>，如果需要别的请求参数直接替换Route:: 后面的请求方法即可。</p>
+</li>
+<li><p>那么问题来了如果我想即支持<code>post</code>又支持<code>get</code> 请求呢 如下便可以了。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Route::match([<span class="string">'post'</span>,<span class="string">'get'</span>],<span class="string">'match'</span>,<span class="string">'HelloController@sayhello'</span>);</span></pre></td></tr></table></figure>
+</li>
+<li><p>当然如果我们想要支持所有的请求呢？<code>Route::any</code> 就可以喽</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Route::any(<span class="string">'matchall'</span>,<span class="string">'HelloController@sayhelloall'</span>);</span></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h4 id="资源路由"><a href="#资源路由" class="headerlink" title="资源路由"></a>资源路由</h4><h5 id="资源控制器（更快捷的控制器）"><a href="#资源控制器（更快捷的控制器）" class="headerlink" title="资源控制器（更快捷的控制器）"></a>资源控制器（更快捷的控制器）</h5><ol>
+<li><p>自动生成增删改以及符合RESTful规范的路由。那么如何在<code>Artisan</code>中生成控制器呢？如下所示：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">D:\www\wamp64\www\laravel56&gt;php artisan make:controller ResoureController --resource</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Controller created successfully.</span></pre></td></tr></table></figure>
+
+<p>当然对应的路由的话，我们只需要<code>Route::resource(&#39;resource&#39;,&#39;ResourceController&#39;)</code>便可生成对应的资源路由在这里我们便不用使用<code>@</code>符号来使用对应的方法。 </p>
+</li>
+<li><p>根据上面的命令，我们可以看出自动生成了许多的资源方法，下面我简单解释一下。</p>
+<ul>
+<li>index() 展示所有的资源信息。</li>
+<li>create()展示创建表单。</li>
+<li>store()处理创建表单的数据，并整理入库 。</li>
+<li>show()展示单个资源的信息。</li>
+<li>edit()展示编辑表单。</li>
+<li>update()整理收集edit()表单的信息，并整理入库。</li>
+<li>destory()删除资源的信息。</li>
+</ul>
+</li>
+</ol>
+<h4 id="初始中间件"><a href="#初始中间件" class="headerlink" title="初始中间件"></a>初始中间件</h4><p> &emsp;&emsp; 在<code>laravel</code>中我们暂时了解到了<code>crsfToken</code>的中间件，那么什么是中间件呢？</p>
+<p>他一般的作用就是过滤所有进入应用的<code>HTTP</code>请求 、或者是在请求过程中执行相应的任务、或者进行统一认证 如 <code>CSRF Auth</code>。那么如何创建一个中间件呢？比如说我要过滤一个人名，那么我将这个中间件叫做<code>checkName</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">D:\www\wamp64\www\laravel56&gt;php artisan make:middleware checkName</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Middleware created successfully.</span></pre></td></tr></table></figure>
+
+<p>如上命令便可成功生成相应的类，但是不要忘了<code>Kernel.php</code>类中进行注册。</p>
+<p>在定义路由时需要使用<code>-&gt;</code>函数来调用<code>middleware()</code>;便会检验相关的参数。</p>
+<p>以上便是<code>laravel</code>中间件的简单使用。</p>
+<h4 id="路由分组"><a href="#路由分组" class="headerlink" title="路由分组"></a>路由分组</h4><p> &emsp;&emsp;路由分组呢定义了我们平时书写路由时定义的繁琐的东西。</p>
+<p>常见的路由分组的方式呢。</p>
+<ol>
+<li>按照前缀分组</li>
+<li>按照命名空间分组</li>
+<li>按照中间件分组</li>
+</ol>
+<h4 id="视图使用总结"><a href="#视图使用总结" class="headerlink" title="视图使用总结"></a>视图使用总结</h4><p>关键点：</p>
+<ol>
+<li>使用<code>view()</code>返回视图 接受两个参数 路径和数据</li>
+<li>在view 视图中使用来展示数据</li>
+<li>如果视图存在多级目录 使用.来表示</li>
+</ol>
+<p><strong>常见的Blade模板语法</strong></p>
+<p><strong>常见输出变量的Blade语法</strong></p>
+<ol>
+<li>转义输出可以有效的防止XSS攻击</li>
+<li>{! $content !} 输出变量的原始值</li>
+<li>我们可以使用@json() 直接输出 json 表达式</li>
+<li>@verbatim 输出大段的原始表达式</li>
+</ol>
+<p><strong>流程控制表达式</strong></p>
+<ol>
+<li><code>@if() @else() @elseif() @endif()</code>非常像普通的表达式只不过加了一个 <code>@</code>值 </li>
+<li><code>@unless() @endunless</code>  当不满足表达式的时候执行内部操作</li>
+<li><code>@isset 和 @empty</code> 判断变量是否存在，变量是否为空</li>
+<li><code>@switch @case @break @default 和 @endswitch</code>  基本的表达式</li>
+<li><code>@auth() 和 @guest()</code>认证表达式</li>
+</ol>
+<p><strong>循环表达式</strong></p>
+<ol>
+<li><code>@for 和 @endfor</code></li>
+<li><code>@foreach() 和 @endforeach()</code> </li>
+<li><code>@forelse()、@empty() 和 @endforelse()</code></li>
+</ol>
+<p><strong>其他表达式</strong></p>
+<ol>
+<li><code>@php 和 @endphp</code> 直接运行PHP代码</li>
+<li><code>\{\{-- --\}\}</code>模板注释 结果不会展示在最终输出的HTML中</li>
+</ol>
+<h4 id="模板的继承和布局"><a href="#模板的继承和布局" class="headerlink" title="模板的继承和布局"></a>模板的继承和布局</h4><p><strong>优点：</strong></p>
+<ol>
+<li>遵循DRY(Don’t repeat yourself)原则,减少开发的成本</li>
+<li>布局简单，容易维护</li>
+</ol>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>定义一个名为 <code>layout.blade.php</code>的主布局文件</li>
+<li>定义多个子视图文件，如 菜单、头部页脚等</li>
+<li>在其他视图中继承布局文件 </li>
+</ol>
+<p><strong>相关语法:</strong></p>
+<ol>
+<li><code>@section</code>定义视图的局部内容 使用 <code>@show</code>结尾</li>
+<li><code>@yield</code>定义指定部分内容</li>
+<li><code>@entends</code> 在子视图中继承主视图模板</li>
+<li><code>@parent 应用 @section</code>中的内容且不覆盖</li>
+<li>在子视图中的<code>@section</code>标签要以<code>@endsection</code>标签来结尾</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/laravel/" rel="tag"><i class="fa fa-tag"></i> laravel</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/11/66-mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" rel="prev" title="深入浅出了解MySQL的主从复制原理">
+      <i class="fa fa-chevron-left"></i> 深入浅出了解MySQL的主从复制原理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/14/69-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" rel="next" title="SSO单点登录原理">
+      SSO单点登录原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是路由"><span class="nav-number">1.</span> <span class="nav-text">什么是路由</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取请求参数"><span class="nav-number">2.</span> <span class="nav-text">获取请求参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#资源路由"><span class="nav-number">3.</span> <span class="nav-text">资源路由</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#资源控制器（更快捷的控制器）"><span class="nav-number">3.1.</span> <span class="nav-text">资源控制器（更快捷的控制器）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#初始中间件"><span class="nav-number">4.</span> <span class="nav-text">初始中间件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#路由分组"><span class="nav-number">5.</span> <span class="nav-text">路由分组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#视图使用总结"><span class="nav-number">6.</span> <span class="nav-text">视图使用总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模板的继承和布局"><span class="nav-number">7.</span> <span class="nav-text">模板的继承和布局</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

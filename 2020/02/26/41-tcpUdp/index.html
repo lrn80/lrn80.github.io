@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言&amp;emsp;&amp;emsp;由于以前学习TCP,UDP协议没有做过很好的整理笔记也有大部分忘记了所以今天也算复习整理一下，传输层UDP协议以及UDP协议的特点,TCP是什么、TCP的特点、TCP的首部、停止等待协议、连续的ARQ协议，经典的TCP协议的建立（三次握手），TCP协议的释放（四次挥手）。">
+<meta name="keywords" content="计算机基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="传输层的TCP&amp;UDP协议详解">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;26&#x2F;41-tcpUdp&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;由于以前学习TCP,UDP协议没有做过很好的整理笔记也有大部分忘记了所以今天也算复习整理一下，传输层UDP协议以及UDP协议的特点,TCP是什么、TCP的特点、TCP的首部、停止等待协议、连续的ARQ协议，经典的TCP协议的建立（三次握手），TCP协议的释放（四次挥手）。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-3.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-4.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-5.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-6.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-8.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-9.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-10.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-11.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-12.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-13.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-14.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-15.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-16.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-17.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-18.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-19.png">
+<meta property="og:updated_time" content="2020-05-25T01:41:48.920Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;41-tcp&amp;udp-1.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/26/41-tcpUdp/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>传输层的TCP&UDP协议详解 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/26/41-tcpUdp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          传输层的TCP&UDP协议详解
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-26 00:00:00" itemprop="dateCreated datePublished" datetime="2020-02-26T00:00:00+08:00">2020-02-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-25 09:41:48" itemprop="dateModified" datetime="2020-05-25T09:41:48+08:00">2020-05-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机基础</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/02/26/41-tcpUdp/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/26/41-tcpUdp/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>&emsp;&emsp;由于以前学习TCP,UDP协议没有做过很好的整理笔记也有大部分忘记了所以今天也算复习整理一下，传输层UDP协议以及UDP协议的特点,TCP是什么、TCP的特点、TCP的首部、停止等待协议、连续的ARQ协议，经典的TCP协议的建立（三次握手），TCP协议的释放（四次挥手）。</p>
+<a id="more"></a>
+<h4 id="UDP协议详解"><a href="#UDP协议详解" class="headerlink" title="UDP协议详解"></a>UDP协议详解</h4><p>UDP(User Datagram Protocol:用户数据报协议)：是面向<strong>无连接</strong>的<strong>不可靠</strong>的传输协议，UDP协议是面向数据报的它会直接将应用层的数据直接打包成数据报直接传输。UDP<strong>没有拥塞控制</strong>、<strong>首部开销小</strong>。</p>
+<p><strong>UDP的首部</strong></p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-1.png" alt=""></p>
+<h4 id="TCP协议详解"><a href="#TCP协议详解" class="headerlink" title="TCP协议详解"></a>TCP协议详解</h4><p>TCP(Transmission Control Protocol:传输控制协议)：面向<strong>连接的</strong>，<strong>点对点的</strong>，提供<strong>可靠的</strong>传输服务，TCP协议提供<strong>全双工</strong>（通信双方可以同时传输数据）的通信协议，TCP是面向<strong>字节流</strong>的协议因此TCP协议也可能对用户的数据进行分块也可能进行合并，可以更好的对用户的数据进行传输。</p>
+<p><strong>TCP的头部信息</strong></p>
+<p>相比TCP的头部信息要比UDP的头部信息丰富的多。</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-2.png" alt=""></p>
+<p>下面我将对TCP的头部信息进行一个简单的介绍</p>
+<ol>
+<li>序号：①占32位范围是0-2的32次方-1②数据的首字节序号</li>
+</ol>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-3.png" alt=""></p>
+<ol start="2">
+<li><p>确认号：①占32位范围是0-2的32次方-1②期望收到的首字节序号</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-4.png" alt=""></p>
+<p>如图所示：如果首字节的数据为501，传输的数据为100。则渴望收到的确认号为601</p>
+</li>
+<li><p>数据偏移：①真是的数据偏离首部的位置</p>
+</li>
+<li><p>TCP的标记位：每一位都有不同的意义。</p>
+</li>
+</ol>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-5.png" alt=""></p>
+<ol start="5">
+<li>窗口： 窗口指明允许对方发送的数据量（最大的数据量）</li>
+<li>紧急指针：当URG=1的时候，指定紧急数据在报文中的位置。</li>
+<li>TCP选项：支持未来对数据的扩展。</li>
+</ol>
+<h4 id="可靠传输的基本原理"><a href="#可靠传输的基本原理" class="headerlink" title="可靠传输的基本原理"></a>可靠传输的基本原理</h4><h5 id="停止等待协议"><a href="#停止等待协议" class="headerlink" title="停止等待协议"></a>停止等待协议</h5><p>下面将计算机分为发送方和接收方，如下图所示，当发送方发送完消息要等接收方确认之后才会发送第二个消息。</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-6.png" alt=""></p>
+<p><strong>超时重传的情况</strong></p>
+<p>发送方再给接收方发送信息的时候数据丢失。</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-8.png" alt=""></p>
+<p>接收方发送确认消息的时候数据丢失。</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-9.png" alt=""></p>
+<p>确认消息很久才到达</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-10.png" alt=""><strong>停止等待协议</strong></p>
+<p>停止等待协议，每发送一个消息都需要一个定时器</p>
+<p>停止等待协议，是最简单的可靠传输协议</p>
+<p>停止等待协议，对<strong>信道的利用效率</strong>不高</p>
+<h5 id="连续的ARQ协议"><a href="#连续的ARQ协议" class="headerlink" title="连续的ARQ协议"></a>连续的ARQ协议</h5><p>&emsp; &emsp; 接收方一般都是采用累积确认的方式。也就是说接收方不必对收到的分组逐个发送确认。而是在收到几个分组后，对按序到达的最后一个分组发送确认。如果收到了这个分组确认信息，则表示到这个分组为止的所有分组都已经正确接收到了。 累积确认的优点是容易实现，即使确认丢失也不必重传。但缺点是，不能正确的向发送方反映出接收方已经正确收到的所有分组的信息。比如发送方发送了前5个分组，而中间的第3个分组丢失了，这时候接收方只能对前2个发出确认。而不知道后面3个分组的下落，因此只能把后面的3个分组都重传一次，这种机制叫Go-back-N（回退N），表示需要再退回来重传已发送过的N个分组。</p>
+<p><strong>滑动窗口</strong></p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-11.png" alt=""></p>
+<p><strong>累积确认</strong></p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-12.png" alt=""></p>
+<h4 id="TCP流量控制"><a href="#TCP流量控制" class="headerlink" title="TCP流量控制"></a>TCP流量控制</h4><ul>
+<li>流量控制指让发送方发送速率不要太快</li>
+<li>流量控制是使用滑动窗口来实现的</li>
+</ul>
+<p>例：</p>
+<p>从上到下是它们交互的一个时间轴。</p>
+<p>当rwnd窗口为0的时候，接收方会马上对数据进行处理并交到应用层进行数据的处理。</p>
+<p>一段时间之后接收方又可以接收消息了，这个时候接收方会往发送方发送一条消息，告诉发送方我当前的窗口为1000可以接收1000个字节的数据了。</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-13.png" alt=""></p>
+<p><strong>特殊情况</strong></p>
+<p>上面的<strong>例:</strong>当接收方调整窗口的大小，给发送方发送消息的时候中途发生了丢失。就会出现下面的情况。</p>
+<p><strong>发送方：</strong> 认为窗口为0，一直等待接收方的窗口调整。</p>
+<p><strong>接收方:</strong>   发送了窗口调整的信息一直等待发送方数据的到来。</p>
+<p>这时候就出现了<strong>阻塞的</strong>状态</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-14.png" alt=""></p>
+<p>对于上面的局面如何解开呢，这个时候就引入了<strong>坚持定时器</strong></p>
+<p><strong>坚持定时器</strong></p>
+<ul>
+<li>当接收窗口为0的消息，就会启动坚持定时器</li>
+<li>坚持定时器每隔一段时间发送一个<strong>窗口探测报文</strong>（询问对方你的窗口有没有增大）</li>
+</ul>
+<h4 id="TCP协议的拥塞控制"><a href="#TCP协议的拥塞控制" class="headerlink" title="TCP协议的拥塞控制"></a>TCP协议的拥塞控制</h4><ul>
+<li>在一条链路中经过非常多的设备</li>
+<li>数据链路中的各个部分都有可能成为网络传输的瓶颈</li>
+</ul>
+<p><strong>流量控制和拥塞控制的区别</strong></p>
+<ul>
+<li>流量控制考虑点对点的通信量的控制</li>
+<li>拥塞控制考虑整个网络，是全局性的考虑</li>
+</ul>
+<p><strong>慢启动算法</strong></p>
+<ul>
+<li>由小到大逐渐增加发送数据量</li>
+<li>每收到一个报文确认，就加一</li>
+</ul>
+<p>由此可见慢启动算法是呈指数增长的，当到了慢启动<strong>阈值</strong>进行<strong>拥塞避免算法</strong>。</p>
+<p><strong>拥塞避免算法</strong></p>
+<ul>
+<li>维护一个拥塞窗口的<strong>变量</strong>，这个变量大于慢启动阈值</li>
+<li>只要网络不拥塞，就试探着拥塞窗口调大</li>
+</ul>
+<h4 id="TCP协议的三次握手"><a href="#TCP协议的三次握手" class="headerlink" title="TCP协议的三次握手"></a>TCP协议的三次握手</h4><p><strong>TCP连接建立的过程</strong></p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-15.png" alt=""></p>
+<ol>
+<li><strong>发送方</strong>向<strong>接收方</strong>主动建立连接 这时 发送SYN=1请求连接的标记 并且同步自己的序列号seq=x</li>
+<li><strong>接收方</strong>回应<strong>发送方</strong> SYN=1 连接请求标记，ACK=1 对序列号的确认 ，确认号ack=x+1表示期望收到x+1序列号的值 seq=y 当前自己的序列号</li>
+<li><strong>发送方</strong> 对接收方ACK=1 表示确认号是有用的 序列号为 seq=x+1 , ack=y+1确认号表示期望收到y+1的序列号</li>
+</ol>
+<p>由上图我们可以看出，发送方在第二次握手结束的时候已经处于建立连接的状态，接收方只有在第三次握手结束才会建立连接。</p>
+<p><strong>为什么发送方要发出第三个确认报文呢？（为什么TCP连接需要三次握手两次不行）</strong> </p>
+<ul>
+<li>已经<strong>失效的连接请求报文传</strong>送到对方，引起<strong>错误</strong></li>
+</ul>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-16.png" alt=""></p>
+<p>对于上面的请求，如果第一次发送的SYN连接请求传输时间过长，发送方在一定时间接收不到接收方回应的信息从新发送了SYN请求这时第一次的SYN请求所执行的功能已经完全被第二次的所代替，如果是两次握手，超时的这次请求接到接收方的回应时也是建立了相同的连接，事实上，这次连接已经废弃了。</p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-17.png" alt=""></p>
+<p>如果是三次握手的话，发送方再次发给接收方确认请求这是在建立连接，当第一次的失效请求再次到达发送方的时候，发送方就会忽略掉这次请求并不会进行任何操作。</p>
+<p><strong>为什么不是四次握手</strong></p>
+<p>如果是四次握手的话，这时候接收方和确认方已经确认了连接的状态如果再有第四次第五次都属徒劳的，可以提高连接的速度与效率。</p>
+<h4 id="TCP的四次挥手（TCP连接的释放）"><a href="#TCP的四次挥手（TCP连接的释放）" class="headerlink" title="TCP的四次挥手（TCP连接的释放）"></a>TCP的四次挥手（TCP连接的释放）</h4><p><img src="http://xy.liruoning.cn/images/41-tcp&udp-18.png" alt=""></p>
+<ol>
+<li>首先我们假设发送方主动断开连接，这时发送方，发送FIN=1释放连接的标志 seq=u 。这时发送方进入第一次的等待状态（FIN-WAIT-1）</li>
+<li>接收方 发送 ACK的确认消息表示你的请求我已经收到了，这时候接收方可能还有数据没有传完，发送方进入第二次的等待状态，接收方进入关闭等待状态，这时候因为接收方是被动断开连接的所以可能还有数据未传输完成。</li>
+<li>等到接收方将数据传输完毕，会发出一个新的传输报文FIN表示我也可以进行连接释放了，并且这次会携带ACK重复的对第一的报文进行确认。</li>
+<li>这时发送方会进行第三次报文的确认，告诉接收方我们一起断开连接吧。这时发送方会进入<strong>等待计时器</strong>的时间确保没有问题进入关闭状态。</li>
+</ol>
+<h4 id="套接字和套接字编程"><a href="#套接字和套接字编程" class="headerlink" title="套接字和套接字编程"></a>套接字和套接字编程</h4><ul>
+<li>使用端口来标记不同的网络进程</li>
+<li>端口(Port)使用16比特位表示(0~65535)</li>
+</ul>
+<p><strong>套接字：</strong> <code>\{IP:Port\}</code></p>
+<ul>
+<li>套接字(Socket)是抽象概念，表示TCP连接的<strong>一端</strong></li>
+<li>通过套接字可以进行数据发送或接收</li>
+</ul>
+<p>TCP的连接由两个套接字组成</p>
+<p><code>TCP=\{Socket1:Socket2\}=\{\{IP:Port\}\{IP:Port\}\}</code></p>
+<p><strong>Socket编程</strong></p>
+<p><img src="http://xy.liruoning.cn/images/41-tcp&udp-19.png" alt=""></p>
+<p>下面是PHP有关Socket编程的小例子</p>
+<p><strong>Server</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">server</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//创建Socket</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span>(($sock = socket_create(AF_INET,SOCK_STREAM,SOL_TCP)) &lt; <span class="number">0</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"socket_create() Why failure is:"</span>.socket_strerror($sock).<span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    $host=<span class="string">"127.0.0.1"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    $port=<span class="number">6666</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span>(($ret = socket_bind($sock,$host,$port)) &lt; <span class="number">0</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"socket_bind() Why failure is:"</span>.socket_strerror($ret).<span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span>(($ret = socket_listen($sock,<span class="number">4</span>)) &lt; <span class="number">0</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"socket_listen() Why failure is:"</span>.socket_strerror($ret).<span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">echo</span> <span class="string">"Server Started, Listen On $host:$port\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    $message = <span class="string">"Wolcome to my Server\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">    $strlen=strlen($message);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">       <span class="keyword">if</span>(($socketMsg=socket_accept($sock))&lt;<span class="number">0</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">echo</span> <span class="string">"socket_accept() failed: reason: "</span> . socket_strerror($socketMsg) . <span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">       &#125;<span class="keyword">else</span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">          socket_write($socketMsg,$message,$strlen);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">          <span class="keyword">echo</span> <span class="string">"向客户端发送的数据$message\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">           $read = socket_read($socketMsg,<span class="number">1024</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">echo</span> <span class="string">"客户端回复的数据:$read\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">       &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">        socket_close($socketMsg);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">    socket_close($sock);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>Client</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Client</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    $host=<span class="string">"127.0.0.1"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    $port=<span class="number">6666</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    $socket=socket_create(AF_INET,SOCK_STREAM,SOL_TCP );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span> ($socket &lt; <span class="number">0</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"socket_create() failed: reason: "</span> . socket_strerror($socket) . <span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    &#125;<span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"try to connect '$host' port: '$port'...\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    $result= socket_connect($socket,$host,$port);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span> ($result &lt; <span class="number">0</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"socket_connect() failed.\nReason: ($result) "</span> . socket_strerror($result) . <span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    &#125;<span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">        <span class="comment"># 连接成功输出提示信息</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"connect successfully\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">        <span class="comment"># 向服务端发送数据</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">        $msg = <span class="string">"I am Client "</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">        socket_write($socket,$msg , strlen($msg));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">        <span class="comment"># 获取服务端数据</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">        $result = socket_read($socket, <span class="number">1024</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"服务器回传数据为："</span>.$result.<span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"close socket...\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">        socket_close($socket);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"close ok\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" rel="tag"><i class="fa fa-tag"></i> 计算机基础</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/24/59-php%E5%B9%B6%E6%9F%A5%E9%9B%86/" rel="prev" title="由浅入深学习并查集（PHP）">
+      <i class="fa fa-chevron-left"></i> 由浅入深学习并查集（PHP）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/27/14-php%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="next" title="PHP实现三个O(n*n)级别的排序算法（选择排序、冒泡排序、插入排序）">
+      PHP实现三个O(n*n)级别的排序算法（选择排序、冒泡排序、插入排序） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UDP协议详解"><span class="nav-number">2.</span> <span class="nav-text">UDP协议详解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP协议详解"><span class="nav-number">3.</span> <span class="nav-text">TCP协议详解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可靠传输的基本原理"><span class="nav-number">4.</span> <span class="nav-text">可靠传输的基本原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#停止等待协议"><span class="nav-number">4.1.</span> <span class="nav-text">停止等待协议</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#连续的ARQ协议"><span class="nav-number">4.2.</span> <span class="nav-text">连续的ARQ协议</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP流量控制"><span class="nav-number">5.</span> <span class="nav-text">TCP流量控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP协议的拥塞控制"><span class="nav-number">6.</span> <span class="nav-text">TCP协议的拥塞控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP协议的三次握手"><span class="nav-number">7.</span> <span class="nav-text">TCP协议的三次握手</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP的四次挥手（TCP连接的释放）"><span class="nav-number">8.</span> <span class="nav-text">TCP的四次挥手（TCP连接的释放）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#套接字和套接字编程"><span class="nav-number">9.</span> <span class="nav-text">套接字和套接字编程</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>lrn&#39;s blog</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2021-06-13T13:27:28.263Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>lrn</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>往后余生多给自己一些期待</title>
+    <link href="http://yoursite.com/2021/06/13/75-2021%E5%B9%B4/"/>
+    <id>http://yoursite.com/2021/06/13/75-2021%E5%B9%B4/</id>
+    <published>2021-06-12T16:00:00.000Z</published>
+    <updated>2021-06-13T13:27:28.263Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;往后余生多给自己一些期待&quot;&gt;&lt;a href=&quot;#往后余生多给自己一些期待&quot; class=&quot;headerlink&quot; title=&quot;往后余生多给自己一些期待&quot;&gt;&lt;/a&gt;往后余生多给自己一些期待&lt;/h3&gt;&lt;hr&gt;
+&lt;p&gt;2021年6月我毕业了，这时的我少了许多稚嫩，多了一些成熟。&lt;/p&gt;
+&lt;p&gt;内心五谷杂陈，不舍涌上心头。&lt;/p&gt;
+&lt;p&gt;这一年有许多遗憾，但完成了许多事情。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="总结" scheme="http://yoursite.com/categories/%E6%80%BB%E7%BB%93/"/>
+    
+    
+      <category term="总结" scheme="http://yoursite.com/tags/%E6%80%BB%E7%BB%93/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>分布式锁（Redis）</title>
+    <link href="http://yoursite.com/2020/08/14/74-redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"/>
+    <id>http://yoursite.com/2020/08/14/74-redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/</id>
+    <published>2020-08-13T16:00:00.000Z</published>
+    <updated>2020-08-14T12:29:08.664Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;hr&gt;
+&lt;p&gt;&amp;emsp;&amp;emsp;锁是我们在程序开发中必不可少的，一旦程序出现了&lt;strong&gt;竞争的条件&lt;/strong&gt;也就是说数据被多个线程共享，那么就很有可能出现&lt;strong&gt;争&lt;/strong&gt;用和冲突的情况，进而会破坏数据共享的一致性。而现在的系统多为分布式系统，对于分布式系统当然就引出了分布式锁的概念。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Redis" scheme="http://yoursite.com/categories/Redis/"/>
+    
+    
+      <category term="redis" scheme="http://yoursite.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从这里明白golang接口的赋值过程发生了什么并打开接口使用的便利</title>
+    <link href="http://yoursite.com/2020/06/28/74-interface/"/>
+    <id>http://yoursite.com/2020/06/28/74-interface/</id>
+    <published>2020-06-27T16:00:00.000Z</published>
+    <updated>2020-06-28T13:01:53.577Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&amp;emsp;&amp;emsp;&lt;strong&gt;golang&lt;/strong&gt;语言的类型常用于代表某种能力或某种特征。在本文中主要讲明白以下几个概念。①&lt;code&gt;动态值&lt;/code&gt;、&lt;code&gt;动态类型&lt;/code&gt;、&lt;code&gt;静态类型&lt;/code&gt;②当我们为一个接口变量赋值时会发生什么③接口变量在什么情况下才真正为&lt;code&gt;nil&lt;/code&gt;④接口之间的组合及其意义。下面我们一起走入这篇文章吧。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Golang" scheme="http://yoursite.com/categories/Golang/"/>
+    
+    
+      <category term="golang" scheme="http://yoursite.com/tags/golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>golang结构体值与指针、多层嵌套小秘密</title>
+    <link href="http://yoursite.com/2020/06/27/73-Struct/"/>
+    <id>http://yoursite.com/2020/06/27/73-Struct/</id>
+    <published>2020-06-26T16:00:00.000Z</published>
+    <updated>2020-07-12T00:30:07.740Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&amp;emsp;&amp;emsp;最近学了&lt;code&gt;golang&lt;/code&gt; &lt;code&gt;Struct&lt;/code&gt;发现里面有一些概念还是有必要弄清的，当然我说的不是基本的如何定义的概念，那些概念相信学过其它语言的小伙伴也能进行类比的学习。开篇点题上问题，首先第一个问题呢 &lt;code&gt;你是否清楚值方法和指针方法的区别呢&lt;/code&gt;，第二个问题 &lt;code&gt;一个结构体中嵌套另一个结构如果有重名的方法或者类型会发生什么呢？&lt;/code&gt;下面将一一展开讲解。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Golang" scheme="http://yoursite.com/categories/Golang/"/>
+    
+    
+      <category term="golang" scheme="http://yoursite.com/tags/golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>golang数组切片“同”与“不同”</title>
+    <link href="http://yoursite.com/2020/06/22/72-golang-Slice/"/>
+    <id>http://yoursite.com/2020/06/22/72-golang-Slice/</id>
+    <published>2020-06-21T16:00:00.000Z</published>
+    <updated>2020-06-22T16:03:16.833Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;开篇&quot;&gt;&lt;a href=&quot;#开篇&quot; class=&quot;headerlink&quot; title=&quot;开篇&quot;&gt;&lt;/a&gt;开篇&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;自从5月份开始我的博客已经停更一个多月了，在这期间发生了很多事情目前的也是在实习期每天晚上9点到家学一会也就不在想写博客了，我感觉这是一个主要的停更原因。马上也要秋招了多更多总结争取写出优质的文章。&lt;/p&gt;
+&lt;p&gt;&amp;emsp;&amp;emsp;废话不多说开篇点题，今天我要讲的内容是关于&lt;code&gt;golang&lt;/code&gt; 的 &lt;code&gt;array&lt;/code&gt;（数组） 和 &lt;code&gt;slice&lt;/code&gt;（切片）的“同”与“不同”以及slice如何扩容。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Golang" scheme="http://yoursite.com/categories/Golang/"/>
+    
+    
+      <category term="golang" scheme="http://yoursite.com/tags/golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>走进laravel经典操作第二部</title>
+    <link href="http://yoursite.com/2020/04/16/71-laravel/"/>
+    <id>http://yoursite.com/2020/04/16/71-laravel/</id>
+    <published>2020-04-15T16:00:00.000Z</published>
+    <updated>2020-04-16T03:37:01.680Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;本文主要介绍了laravel关于数据库的相关操作，也是比较核心的操作了，其中从原生的SQL到查询构造器再到ORM循序渐进的学了SQL的操作。越往后方法越简单越使用。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Laravel" scheme="http://yoursite.com/categories/Laravel/"/>
+    
+    
+      <category term="laravel" scheme="http://yoursite.com/tags/laravel/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SSO单点登录原理</title>
+    <link href="http://yoursite.com/2020/04/14/69-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/"/>
+    <id>http://yoursite.com/2020/04/14/69-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/</id>
+    <published>2020-04-13T16:00:00.000Z</published>
+    <updated>2020-05-25T01:42:36.117Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp; 例如公司有一个考勤系统我需要，注册账号、登录、使用，后来又有一个邮件系统注册账号、登录、使用。如果公司的系统越来越多。如此循环是不是越来越繁琐并且没有必要。假如可以登录一次就能访问多个系统，这样岂不是很方便，如此将引出单点登录系统。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="PHP" scheme="http://yoursite.com/categories/PHP/"/>
+    
+    
+      <category term="php" scheme="http://yoursite.com/tags/php/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>走进laravel经典操作</title>
+    <link href="http://yoursite.com/2020/04/12/70-laravel/"/>
+    <id>http://yoursite.com/2020/04/12/70-laravel/</id>
+    <published>2020-04-11T16:00:00.000Z</published>
+    <updated>2020-04-15T12:41:17.375Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;什么是路由&quot;&gt;&lt;a href=&quot;#什么是路由&quot; class=&quot;headerlink&quot; title=&quot;什么是路由&quot;&gt;&lt;/a&gt;什么是路由&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;当学一个框架的时候路由肯定是必须要掌握的，首先路由的概念，当访问一个链接地址时，它会找到路由，然后由路由找到控制器，控制器会找到数据模型，数据模型返回数据到控制器，将数据渲染到视图。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Laravel" scheme="http://yoursite.com/categories/Laravel/"/>
+    
+    
+      <category term="laravel" scheme="http://yoursite.com/tags/laravel/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入浅出了解MySQL的主从复制原理</title>
+    <link href="http://yoursite.com/2020/04/11/66-mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/"/>
+    <id>http://yoursite.com/2020/04/11/66-mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</id>
+    <published>2020-04-10T16:00:00.000Z</published>
+    <updated>2020-04-11T02:11:43.748Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&amp;emsp;&amp;emsp;本文主要讲述了MySQL主从复制的原理，具体的搭建过程这里就不再讲述了，下面我将从为什么需要主从复制开始讲起，逐渐的深入。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="mysql" scheme="http://yoursite.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>认识Web网络安全</title>
+    <link href="http://yoursite.com/2020/04/06/64-http/"/>
+    <id>http://yoursite.com/2020/04/06/64-http/</id>
+    <published>2020-04-05T16:00:00.000Z</published>
+    <updated>2020-04-08T12:06:02.307Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;Web安全攻击&quot;&gt;&lt;a href=&quot;#Web安全攻击&quot; class=&quot;headerlink&quot; title=&quot;Web安全攻击&quot;&gt;&lt;/a&gt;Web安全攻击&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;在HTTP协议请求的过程中，安全问题通常会发生在Web页到业务逻辑层之间，只有认识到了网络安全才可让自己的程序更具保障性。下面听博主简述Web安全问题。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="HTTP" scheme="http://yoursite.com/categories/HTTP/"/>
+    
+    
+      <category term="http" scheme="http://yoursite.com/tags/http/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>PHP数组的底层实现</title>
+    <link href="http://yoursite.com/2020/03/28/60-php%E6%95%B0%E7%BB%84%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/"/>
+    <id>http://yoursite.com/2020/03/28/60-php%E6%95%B0%E7%BB%84%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/</id>
+    <published>2020-03-27T16:00:00.000Z</published>
+    <updated>2020-05-25T01:42:13.388Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;PHP数组&quot;&gt;&lt;a href=&quot;#PHP数组&quot; class=&quot;headerlink&quot; title=&quot;PHP数组&quot;&gt;&lt;/a&gt;PHP数组&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;数组是PHP中非常强大、灵活的数据类型，它的底层为散列表（HashTable，也称 哈希表），散列表是通过关键码值（Key Value）而直接进行访问的数据结构，它是Key Value 的一种映射函数可以通过 Key 直接找到相应的Value ，在理想情况下无需比较可以找到待查关键字，查找的期望时间O(1)。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="PHP" scheme="http://yoursite.com/categories/PHP/"/>
+    
+    
+      <category term="php" scheme="http://yoursite.com/tags/php/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>数据库的事务处理</title>
+    <link href="http://yoursite.com/2020/03/23/58-mysql%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"/>
+    <id>http://yoursite.com/2020/03/23/58-mysql%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/</id>
+    <published>2020-03-22T16:00:00.000Z</published>
+    <updated>2020-05-25T01:42:16.198Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp; 事务是并发控制的基本单位。所谓的事务是指一组操作序列这组操作序列，要么都执行要么都不执行，是一个不可分割的工作单位。事务处理（transaction processing）可以用来维护数据库的完整性，它保证一组的MySQL操作的一致性。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="mysql" scheme="http://yoursite.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从实战到原理逐渐深入Redis集群</title>
+    <link href="http://yoursite.com/2020/03/19/56-redis%E9%9B%86%E7%BE%A4/"/>
+    <id>http://yoursite.com/2020/03/19/56-redis%E9%9B%86%E7%BE%A4/</id>
+    <published>2020-03-18T16:00:00.000Z</published>
+    <updated>2020-05-25T01:42:05.740Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;在本文章中博主从主从同步到Redis集群实战到Redis集群原理做了讲解。主从同步可以防止主机坏掉，导致网站不能正常的运行，在这种方法中如果主机宕掉直接把从机设置为主机即可。在Redis中主从同步的配置也是很简单。获益匪浅💪。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Redis" scheme="http://yoursite.com/categories/Redis/"/>
+    
+    
+      <category term="redis" scheme="http://yoursite.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis的持久化</title>
+    <link href="http://yoursite.com/2020/03/18/55-redis%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%BA%E5%88%B6/"/>
+    <id>http://yoursite.com/2020/03/18/55-redis%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%BA%E5%88%B6/</id>
+    <published>2020-03-17T16:00:00.000Z</published>
+    <updated>2020-03-18T03:03:09.821Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;Redis是基于内存的数据库，内存数据库有个弊端：如果突然宕机或者断电时数据就会丢失。为了解决这个问题Redis提供了两种持久化的方法，内存快照和日志追加。下面将听博主介绍这两种持久化的方式。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Redis" scheme="http://yoursite.com/categories/Redis/"/>
+    
+    
+      <category term="redis" scheme="http://yoursite.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL分区分表技术</title>
+    <link href="http://yoursite.com/2020/03/15/47-mysql%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%88%86%E5%8C%BA%E5%88%86%E8%A1%A8/"/>
+    <id>http://yoursite.com/2020/03/15/47-mysql%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%88%86%E5%8C%BA%E5%88%86%E8%A1%A8/</id>
+    <published>2020-03-14T16:00:00.000Z</published>
+    <updated>2020-05-25T01:41:45.201Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;如果数据表记录的数据非常多，数据表的运行速度也会比较慢，效率降低，影响MySQL的整体性能，这时候我们可以通过分区、分表技术来提高数据表的效率，然而，分区技术虽然好，如果不合理使用也会降低数据库的性能。接下来听博主浅谈数据库的分区，分表技术。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="mysql" scheme="http://yoursite.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入浅出MySQL的锁机制</title>
+    <link href="http://yoursite.com/2020/03/11/46-mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/"/>
+    <id>http://yoursite.com/2020/03/11/46-mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/</id>
+    <published>2020-03-10T16:00:00.000Z</published>
+    <updated>2020-05-25T01:41:27.040Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;说起MySQL的锁机制，一直是一个常见的话题。例如：当客户端操作表的记录时，为了保证数据的隔离性(多个客户端的操作互不影响) ，我们通常使用加锁来处理。或者产生死锁的时候如何排查？都和锁有关。下面我将对MySQL的锁机制展开学习。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="mysql" scheme="http://yoursite.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>PHP实现两个O(nlog n)级别的排序算法（归并排序、快速排序）</title>
+    <link href="http://yoursite.com/2020/03/09/15-php%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/"/>
+    <id>http://yoursite.com/2020/03/09/15-php%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</id>
+    <published>2020-03-08T16:00:00.000Z</published>
+    <updated>2020-07-29T02:19:37.546Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&amp;emsp;&amp;emsp;在完成&lt;strong&gt;归并排序&lt;/strong&gt;和&lt;strong&gt;快速排序&lt;/strong&gt;过程中，使用了&lt;strong&gt;分而治之&lt;/strong&gt;的算法的思想，所谓的&lt;strong&gt;分而治之&lt;/strong&gt;顾名思义将原问题分割成同等结构的子问题，再将子问题逐一解决，进而原问题也会得到解决。在完成快速排序，过程中，也扩展了双路排序，三路排序等内容来优化一些特殊的情况。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="算法" scheme="http://yoursite.com/categories/%E7%AE%97%E6%B3%95/"/>
+    
+    
+      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>数据库的范式和反范式</title>
+    <link href="http://yoursite.com/2020/03/07/65-mysql%E8%8C%83%E5%BC%8F%E5%92%8C%E5%8F%8D%E8%8C%83%E5%BC%8F/"/>
+    <id>http://yoursite.com/2020/03/07/65-mysql%E8%8C%83%E5%BC%8F%E5%92%8C%E5%8F%8D%E8%8C%83%E5%BC%8F/</id>
+    <published>2020-03-06T16:00:00.000Z</published>
+    <updated>2020-05-25T01:42:39.890Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;数据库的范式是数据库设计中必须掌握的知识，没有对范式的理解，就无法设计出高效率优雅的数据库，但是有时由于业务的需求我们也需要进行反范式。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="mysql" scheme="http://yoursite.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>因上课安装的软件繁琐，安装虚拟机（win10）来探索</title>
+    <link href="http://yoursite.com/2020/03/05/45-window%E8%99%9A%E6%8B%9F%E6%9C%BA/"/>
+    <id>http://yoursite.com/2020/03/05/45-window%E8%99%9A%E6%8B%9F%E6%9C%BA/</id>
+    <published>2020-03-04T16:00:00.000Z</published>
+    <updated>2020-05-25T01:41:39.289Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;事因&quot;&gt;&lt;a href=&quot;#事因&quot; class=&quot;headerlink&quot; title=&quot;事因&quot;&gt;&lt;/a&gt;事因&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;最近在上网络编程和Mobile Application Development课程，需要安装 Visual Studio 类的软件开始在相关的网站下载执行程序，运行选择要用的负载工具，安装成功后，建立了第一个Android App(C#)文件可是在运行的时候，死活就是报错缺少SDK，找了很多办法,卸载重装也不能解决。看了一下网上的资料也找到了SDK文件，路径也正确，反正就是报错，一气之下，打算下一个window虚拟机打算在里面进行操作，非要解决这个问题，下面将记录下载的过程。希望对你有帮助。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="计算机基础" scheme="http://yoursite.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
+    
+    
+      <category term="计算机基础" scheme="http://yoursite.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>网络基础HTTP协议的详解</title>
+    <link href="http://yoursite.com/2020/03/01/43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE/"/>
+    <id>http://yoursite.com/2020/03/01/43-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80http%E5%8D%8F%E8%AE%AE/</id>
+    <published>2020-02-29T16:00:00.000Z</published>
+    <updated>2020-05-25T01:41:35.930Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h4&gt;&lt;p&gt;&amp;emsp;&amp;emsp;在这篇博文之前我已经发表过一次有关http协议的博文，在哪篇博文中主要是对http内容的概述，今天这篇博文主要记录了HTTP是如何建立连接的呀。HTTP的响应头，和请求头参数的含义，以及HTTPS是一种构建在SSL或者TLS上的HTTP协议、对称和非对称加密。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="HTTP" scheme="http://yoursite.com/categories/HTTP/"/>
+    
+    
+      <category term="http" scheme="http://yoursite.com/tags/http/"/>
+    
+  </entry>
+  
+</feed>

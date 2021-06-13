@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Web安全攻击&amp;emsp;&amp;emsp;在HTTP协议请求的过程中，安全问题通常会发生在Web页到业务逻辑层之间，只有认识到了网络安全才可让自己的程序更具保障性。下面听博主简述Web安全问题。">
+<meta name="keywords" content="http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="认识Web网络安全">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;04&#x2F;06&#x2F;64-http&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="Web安全攻击&amp;emsp;&amp;emsp;在HTTP协议请求的过程中，安全问题通常会发生在Web页到业务逻辑层之间，只有认识到了网络安全才可让自己的程序更具保障性。下面听博主简述Web安全问题。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-04-08T12:06:02.307Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/06/64-http/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>认识Web网络安全 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/06/64-http/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          认识Web网络安全
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-06 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-06T00:00:00+08:00">2020-04-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-08 20:06:02" itemprop="dateModified" datetime="2020-04-08T20:06:02+08:00">2020-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP/" itemprop="url" rel="index">
+                    <span itemprop="name">HTTP</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/06/64-http/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/06/64-http/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="Web安全攻击"><a href="#Web安全攻击" class="headerlink" title="Web安全攻击"></a>Web安全攻击</h4><p>&emsp;&emsp;在HTTP协议请求的过程中，安全问题通常会发生在Web页到业务逻辑层之间，只有认识到了网络安全才可让自己的程序更具保障性。下面听博主简述Web安全问题。</p>
+<a id="more"></a>
+<h4 id="验证机制概述"><a href="#验证机制概述" class="headerlink" title="验证机制概述"></a>验证机制概述</h4><ul>
+<li>验证机制是web应用程序中最简单的一种<strong>安全机制</strong><ol>
+<li>一般来说，应用程序<strong>必须核实</strong>用户提交的用户名和密码是否正确。正确则允许登录，否则禁止登录</li>
+</ol>
+</li>
+<li>验证机制是应用程序防御恶意攻击的<strong>核心机制</strong>也是最外层的机制<ol>
+<li>它处于安全防御的最前沿，如果被用户轻易突破，通常应用程序的全部功能、数据都会被其控制</li>
+<li><strong>缺乏安全有效的验证机制</strong>，其他核心安全机制都无法实施（会话管理和访问控制）</li>
+</ol>
+</li>
+</ul>
+<h5 id="验证技术"><a href="#验证技术" class="headerlink" title="验证技术"></a>验证技术</h5><ol>
+<li>基于HTML表单的验证（输入用户名、密码、验证码）</li>
+<li>多元机制，如组合型密码（如 让你输入用户名密码、再让你输入一些验证的问题）</li>
+<li>客户端SSL证书</li>
+</ol>
+<ul>
+<li><strong>验证码技术</strong><ol>
+<li>验证码是否真实有效（不要只有验证码有没有验证设施）</li>
+<li>验证码的复杂度（只有简单的英文字母和数字）</li>
+<li>应对当前的“打码”事业盛行</li>
+</ol>
+</li>
+<li><strong>Cookie和会话检测</strong><ol>
+<li>有些程序会设置<strong>cookie</strong>,如failedlogin=0;登录尝试失败，递增该值，达到某个上限，检测到这个值并拒绝再次处理登录。</li>
+</ol>
+</li>
+<li><strong>双因子认证</strong><ol>
+<li>综合<strong>个人密码</strong>和<strong>手机</strong>来达到双重认证的效果</li>
+</ol>
+</li>
+<li><strong>多阶登录机制</strong><ol>
+<li>这里存在的安全问题比如我们的安全验证有三层，有可能前两层会被跳过前两层直接到达第三层，这时第三层的安全信息又比较简单。进行暴力破解之后通过。</li>
+</ol>
+</li>
+</ul>
+<h4 id="会话管理机制"><a href="#会话管理机制" class="headerlink" title="会话管理机制"></a>会话管理机制</h4><ol>
+<li>由于会话管理机制所发挥的关键作用，它们成为针对应用程序的<strong>恶意攻击</strong>的主要目标</li>
+<li>若攻击者能够破坏应用程序的会话管理，他就能轻易避开其实施的验证机制，不需用户证书即可伪装成其他应用程序用户。</li>
+</ol>
+<p><strong>会话终止攻击</strong></p>
+<ol>
+<li>尽可能<strong>缩短</strong>一个<strong>会话的寿命</strong>可降低攻击者截获、猜测或滥用有效会话令牌的可能性。、</li>
+</ol>
+<h4 id="会话管理漏洞的防御"><a href="#会话管理漏洞的防御" class="headerlink" title="会话管理漏洞的防御"></a>会话管理漏洞的防御</h4><ol>
+<li>令牌只能通过HTTPS传送。</li>
+<li>如果使用HTTP cookie传送令牌（大多数情况下），应将这些cookie标记为<code>secure</code>，以防止用户浏览器通过HTTP传送它们。</li>
+<li><strong>软会话过期</strong>在一段时间用户没有和应用系统进行交互我们就让Session失效</li>
+<li><strong>提供完善的注销功能</strong>用户可以手动的使当前的会话过期，也就是说给用户设置登出功能，让用户可以清除会话</li>
+</ol>
+<h4 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h4><ol>
+<li>攻击者利用SQL注入读取或者修改数据库中保存的所有数据。</li>
+</ol>
+<p><strong>防止</strong></p>
+<ol>
+<li>预处理语句，指定查询结构，用户输入预留的占位符</li>
+<li>指定占位符的内容</li>
+</ol>
+<h4 id="XSS跨站脚本攻击"><a href="#XSS跨站脚本攻击" class="headerlink" title="XSS跨站脚本攻击"></a>XSS跨站脚本攻击</h4><h5 id="XSS攻击的原理"><a href="#XSS攻击的原理" class="headerlink" title="XSS攻击的原理"></a>XSS攻击的原理</h5><ol>
+<li>跨脚本攻击（Cross Site Scripting）,XSS是一种经常出现再web应用中的计算机安全漏洞，它允许恶意web用户将代码植入到提供给其它用户使用的页面中，其他用户在观看页面时，恶意脚本就会执行，这类攻击通常通过注入<code>HTML</code>或<code>JS</code>脚本来发起攻击。攻击成功后，攻击者可以得到私密网页内容和cookie等</li>
+</ol>
+<h5 id="XSS的危害"><a href="#XSS的危害" class="headerlink" title="XSS的危害"></a>XSS的危害</h5><ol>
+<li>盗取用的账号：登录账号、用户的银行账号</li>
+<li>数据控制：读取、篡改、添加、删除企业的敏感数据</li>
+</ol>
+<h5 id="XSS的分类"><a href="#XSS的分类" class="headerlink" title="XSS的分类"></a>XSS的分类</h5><ul>
+<li><p><strong>反射式XSS（非永久性XSS）</strong>：即使的一个链接的方式反射过去</p>
+<ol>
+<li>代码隐藏在链接中，欺骗用户自己去点击链接时触发XSS代码，一般出现在搜索页面。</li>
+</ol>
+</li>
+<li><p><strong>存储式XSS （永久性XSS）</strong></p>
+<ol>
+<li>XSS代码被插入到类似个人信息或发表的文章等存储在服务器上的信息中。</li>
+</ol>
+</li>
+<li><p><strong>基于DOM的XSS攻击</strong></p>
+<p>反射式XSS和存储式XSS攻击通过服务器端提取用户提交的数据。基于DOM的只是在前端通过JS的方式执行。</p>
+</li>
+</ul>
+<h5 id="XSS攻击载荷（我到底攻击那）"><a href="#XSS攻击载荷（我到底攻击那）" class="headerlink" title="XSS攻击载荷（我到底攻击那）"></a>XSS攻击载荷（我到底攻击那）</h5><ul>
+<li><strong>会话令牌</strong><ol>
+<li>劫持用户的身份令牌劫持会话进而以被劫持用户的省份来使用应用程序。</li>
+</ol>
+</li>
+<li><strong>虚拟置换</strong><ol>
+<li>再Web应用程序页面注入恶意数据，从而向应用程序的用户传送误导型的信息。</li>
+</ol>
+</li>
+<li><strong>注入木马</strong><ol>
+<li>在攻击中，攻击者向用户提供和一个登录的表单诱导用户向攻击者的服务器提交他们的证书。</li>
+</ol>
+</li>
+</ul>
+<h5 id="XSS防御措施"><a href="#XSS防御措施" class="headerlink" title="XSS防御措施"></a>XSS防御措施</h5><ul>
+<li><strong>过滤</strong></li>
+</ul>
+<ol>
+<li>对提交内容的非法标签和属性（<code>&lt;script&gt;</code>、<code>onclick</code>等）进行过滤，从而避免XSS攻击。</li>
+</ol>
+<ul>
+<li><strong>转义</strong><ol>
+<li>通过<code>htmlspecialchars</code>等函数，将提交内容中的字符”&lt;”(小于) 和 “&gt;”(大于)转换为HTML实体。</li>
+</ol>
+</li>
+</ul>
+<h4 id="CSRF（跨站请求伪造）"><a href="#CSRF（跨站请求伪造）" class="headerlink" title="CSRF（跨站请求伪造）"></a>CSRF（跨站请求伪造）</h4><p><strong>定义：</strong>通过伪装来自受信任用户的请求来利用受信任的网站进行攻击。</p>
+<p><strong>csrf攻击的本质:</strong>绕过同源策略，使用<code>cookie</code>进行攻击的一种方式。</p>
+<p><strong>同源策略：</strong>是一种约定，它是浏览器最核心也是最基本的安全功能。如果两个网页的<strong>协议</strong>、<strong>域名</strong>、<strong>端口</strong>均相同，就认为这两个网页同源。</p>
+<p><strong>同源策略的作用：</strong>保护cookie不被其他站点读取。</p>
+<h5 id="CSRF的攻击方式"><a href="#CSRF的攻击方式" class="headerlink" title="CSRF的攻击方式"></a>CSRF的攻击方式</h5><ol>
+<li><strong>get型攻击：</strong> 通过模拟<code>get</code>型请求，向目标网站发起攻击。一般情况下会制造一个超链接，让用户去触发这个超链接，并且这个超链接和目标网站是同源的，只有同源的用户才会带着<code>cookie</code></li>
+<li><strong>post型攻击:</strong>通过模拟<code>post</code>请求，发起表单的提交从而达到攻击的目的。</li>
+</ol>
+<p><strong>XSS与CSRF不同</strong>：<code>XSS</code>利用站点内的信任用户（受害者），而<code>CSRF</code>通过伪装来自受信任用户的请求来利用受信任的网站。</p>
+<p><code>CSRF</code>通过如(电子邮件发送一个链接)来蛊惑受害者进行一些敏感性的操作，如修改密码、修改E-mail、转账等，而受害者还不知道他已经中招。</p>
+<h5 id="CSRF预防"><a href="#CSRF预防" class="headerlink" title="CSRF预防"></a>CSRF预防</h5><ol>
+<li><p><strong>referer防范</strong>：通过判断请求头中的<code>referer</code>头，确定请求的来源，从而避免CSRF攻击。</p>
+</li>
+<li><p><strong>token防范</strong>：通过在表单中添加token，标识表单的合法性，来避免CSRF攻击。因为用户的token是从后台发过来的，所以用户在携带这个token到后台。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/http/" rel="tag"><i class="fa fa-tag"></i> http</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/28/60-php%E6%95%B0%E7%BB%84%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" rel="prev" title="PHP数组的底层实现">
+      <i class="fa fa-chevron-left"></i> PHP数组的底层实现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/11/66-mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" rel="next" title="深入浅出了解MySQL的主从复制原理">
+      深入浅出了解MySQL的主从复制原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Web安全攻击"><span class="nav-number">1.</span> <span class="nav-text">Web安全攻击</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#验证机制概述"><span class="nav-number">2.</span> <span class="nav-text">验证机制概述</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#验证技术"><span class="nav-number">2.1.</span> <span class="nav-text">验证技术</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#会话管理机制"><span class="nav-number">3.</span> <span class="nav-text">会话管理机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#会话管理漏洞的防御"><span class="nav-number">4.</span> <span class="nav-text">会话管理漏洞的防御</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SQL注入"><span class="nav-number">5.</span> <span class="nav-text">SQL注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#XSS跨站脚本攻击"><span class="nav-number">6.</span> <span class="nav-text">XSS跨站脚本攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS攻击的原理"><span class="nav-number">6.1.</span> <span class="nav-text">XSS攻击的原理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS的危害"><span class="nav-number">6.2.</span> <span class="nav-text">XSS的危害</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS的分类"><span class="nav-number">6.3.</span> <span class="nav-text">XSS的分类</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS攻击载荷（我到底攻击那）"><span class="nav-number">6.4.</span> <span class="nav-text">XSS攻击载荷（我到底攻击那）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS防御措施"><span class="nav-number">6.5.</span> <span class="nav-text">XSS防御措施</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CSRF（跨站请求伪造）"><span class="nav-number">7.</span> <span class="nav-text">CSRF（跨站请求伪造）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#CSRF的攻击方式"><span class="nav-number">7.1.</span> <span class="nav-text">CSRF的攻击方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CSRF预防"><span class="nav-number">7.2.</span> <span class="nav-text">CSRF预防</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

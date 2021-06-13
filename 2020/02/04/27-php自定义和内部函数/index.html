@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="变量的作用域和静态变量静态变量静态变量仅存在局部函数域中存在，当程序执行离开此函数域时，其值并不会消失。">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="php自定义和系统内置回顾">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;04&#x2F;27-php%E8%87%AA%E5%AE%9A%E4%B9%89%E5%92%8C%E5%86%85%E9%83%A8%E5%87%BD%E6%95%B0&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="变量的作用域和静态变量静态变量静态变量仅存在局部函数域中存在，当程序执行离开此函数域时，其值并不会消失。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-03-03T10:32:12.471Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/04/27-php%E8%87%AA%E5%AE%9A%E4%B9%89%E5%92%8C%E5%86%85%E9%83%A8%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>php自定义和系统内置回顾 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/04/27-php%E8%87%AA%E5%AE%9A%E4%B9%89%E5%92%8C%E5%86%85%E9%83%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          php自定义和系统内置回顾
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-04 00:00:00" itemprop="dateCreated datePublished" datetime="2020-02-04T00:00:00+08:00">2020-02-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-03 18:32:12" itemprop="dateModified" datetime="2020-03-03T18:32:12+08:00">2020-03-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PHP/" itemprop="url" rel="index">
+                    <span itemprop="name">PHP</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/02/04/27-php%E8%87%AA%E5%AE%9A%E4%B9%89%E5%92%8C%E5%86%85%E9%83%A8%E5%87%BD%E6%95%B0/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/04/27-php%E8%87%AA%E5%AE%9A%E4%B9%89%E5%92%8C%E5%86%85%E9%83%A8%E5%87%BD%E6%95%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="变量的作用域和静态变量"><a href="#变量的作用域和静态变量" class="headerlink" title="变量的作用域和静态变量"></a>变量的作用域和静态变量</h4><h5 id="静态变量"><a href="#静态变量" class="headerlink" title="静态变量"></a>静态变量</h5><p>静态变量<strong>仅存在局部函数域中存在</strong>，当程序执行<strong>离开此函数域</strong>时，其值<strong>并不会</strong>消失。 </p>
+<a id="more"></a>
+
+<p><strong>static</strong>关键字</p>
+<ol>
+<li>仅初始化一次</li>
+<li>初始化时需要赋值</li>
+<li>每次执行函数该值会保留</li>
+<li>static修饰的变量是局部的，仅在函数的内部有用</li>
+<li>可以记录函数的调用次数，从而可以在某些条件下终止递归</li>
+</ol>
+<h4 id="PHP函数"><a href="#PHP函数" class="headerlink" title="PHP函数"></a>PHP函数</h4><h5 id="函数的参数"><a href="#函数的参数" class="headerlink" title="函数的参数"></a>函数的参数</h5><ol>
+<li>默认情况下，我们函数的传递是值传递。当我们想要<strong>改变参数</strong>的时候，改为引用传递。</li>
+</ol>
+<h5 id="函数的返回值"><a href="#函数的返回值" class="headerlink" title="函数的返回值"></a>函数的返回值</h5><ol>
+<li>我们函数的返回值是通过return返回</li>
+<li>可以返回数组对象任意类型</li>
+<li>返回语句会终止函数的执行，将控制权交给函数的调用处</li>
+<li>省略<strong>return</strong>，返回值是<strong>NULL</strong>,不可以有<strong>多个</strong>返回值。</li>
+</ol>
+<h5 id="函数引用的返回"><a href="#函数引用的返回" class="headerlink" title="函数引用的返回"></a>函数引用的返回</h5><p>例子：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> &amp;<span class="title">myfunc</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">static</span> $a = <span class="number">1</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> $a;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">$b=myfunc();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $b;    <span class="comment">// 1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">$b = &amp;myfunc();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">$b=<span class="number">100</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $b;    <span class="comment">//100</span></span></pre></td></tr></table></figure>
+
+<p>从一个函数返回一个<strong>引用</strong>,必须在函数的声明和在返回值给一个变量的时候加上引用符号&amp;；</p>
+<h5 id="系统内置函数"><a href="#系统内置函数" class="headerlink" title="系统内置函数"></a>系统内置函数</h5><h6 id="时间日期函数"><a href="#时间日期函数" class="headerlink" title="时间日期函数"></a>时间日期函数</h6><ol>
+<li><p>date() ：将时间戳转化成日期格式。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> date(<span class="string">"Y-m-d H:i:s"</span>);  <span class="comment">//2020-02-03 07:42:18</span></span></pre></td></tr></table></figure>
+
+<p>date()函数有两个参数 <strong>第一个</strong>参数：定义格式。<strong>第二个</strong>参数：时间戳如果不定义默认是当前的。</p>
+</li>
+<li><p>time()：获得UNIX时间戳</p>
+</li>
+<li><p>date_default_timezone_set():设置时区。 date_default_timezone_set(“PRC”)中华人民共和国时区</p>
+</li>
+<li><p>mktime():取得<strong>一个日期</strong>的UNIX<strong>时间戳</strong></p>
+<p>传值<strong>格式</strong>：</p>
+<p>int <strong>mktime</strong>    ([ int <code>$hour</code> = date(“H”)   [, int <code>$minute</code> = date(“i”)   [, int <code>$second</code> = date(“s”)   [, int <code>$month</code> = date(“n”)   [, int <code>$day</code> = date(“j”)   [, int <code>$year</code> = date(“Y”)   [, int <code>$is_dst</code> = -1  ]]]]]]] )</p>
+</li>
+<li><p>strtotime():将任何英文文本的日期时间描述解析为 Unix 时间戳</p>
+<p>传值<strong>格式</strong>：int <strong>strtotime</strong>    ( string <code>$time</code>   [, int <code>$now</code> = time()  ] )</p>
+</li>
+<li><p>microtime():返回UNIX时间戳和微秒数</p>
+</li>
+</ol>
+<h6 id="IP处理函数"><a href="#IP处理函数" class="headerlink" title="IP处理函数"></a>IP处理函数</h6><ol>
+<li>ip2long():将一个IPV4的字符串互联网协议转换成数字格式</li>
+<li>long2ip():Converts an long integer address into a string in (IPv4) Internet standard dotted format</li>
+</ol>
+<h6 id="打印函数"><a href="#打印函数" class="headerlink" title="打印函数"></a>打印函数</h6><ol>
+<li>print(),echo 两个都是语言结构 <strong>不同</strong>print()只能打印一个值 echo 可以打印多个变量用 “，”隔开。print()有返回值但是总是返回1不过这个没有什么意义。</li>
+<li>printf()和sprintf()。printf()把变量进行格式化的输出。sprintf()把格式话的字符串，写入一个变量不会输出。</li>
+<li>print_r()把数组对象进行格式化的输出。</li>
+<li>var_dump() 把变量进行格式化输出并且返回<strong>类型</strong></li>
+<li>var_export():此函数返回关于传递给该函数的变量的结构信息，它和       <a href="mk:@MSITStore:C:\Users\李若宁\Desktop\php手册\php_enhanced_zh.chm::/res/function.var-dump.html" target="_blank" rel="noopener">var_dump()</a> 类似，不同的是其返回的表示是<strong>合法的PHP 代码</strong>。 您可以通过将函数的第二个参数设置为      <strong><code>TRUE</code></strong>，从而返回变量的表示。</li>
+</ol>
+<h6 id="序列化和反序列化"><a href="#序列化和反序列化" class="headerlink" title="序列化和反序列化"></a>序列化和反序列化</h6><ol>
+<li>serialize():函数用于序列化对象或数组，并返回一个字符串,函数序列化对象后，可以很方便的将它传递给其他需要它的地方，且其类型和结构不会改变。</li>
+<li>unserialize():函数用于将通过 <a href="https://www.runoob.com/php/php-serialize-function.html" target="_blank" rel="noopener">serialize() </a>函数序列化后的对象或数组进行反序列化，并返回原始的对象结构。</li>
+</ol>
+<h6 id="字符串处理函数"><a href="#字符串处理函数" class="headerlink" title="字符串处理函数"></a>字符串处理函数</h6><ol>
+<li><p>strrev():颠倒字符串</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"this is php string test"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> strrev($str); <span class="comment">//tset gnirts php si siht</span></span></pre></td></tr></table></figure>
+
+<p>2.implode():将一个一维数组的值转化为字符串</p>
+</li>
+</ol>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * string implode( string $glue, array $pieces)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * 参数： glue默认为空的字符串。 pieces 你想要转换的数组。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * 返回值：返回一个字符串，其内容为由 glue 分割开的数组的值。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">*/</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">$arr = [<span class="string">"one"</span>,<span class="string">"two"</span>,<span class="string">"three"</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">$str=implode(<span class="string">"-"</span>,$arr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $str; <span class="comment">//one-two-three</span></span></pre></td></tr></table></figure>
+
+<p>   3.explode ()使用一个字符串分割另一个字符串</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"this is php string test"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$arr=explode(<span class="string">" "</span>,$str);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">print_r($arr); <span class="comment">//Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//[0] =&gt; this</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//[1] =&gt; is</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//[2] =&gt; php</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//[3] =&gt; string</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//[4] =&gt; test</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//)</span></span></pre></td></tr></table></figure>
+
+<p>4.join(): 是implode()的别名</p>
+<p>5.number_format():以千位分隔符方式格式化一个数字</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$str = <span class="string">"1234567891.231432432"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$strFormat=number_format($str,<span class="number">4</span>);  <span class="comment">//第二个参数保留几位小数 第三个参数 小数和千分位的分隔符 第四个参数还有千分位的分割符</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> $strFormat;  <span class="comment">//1,234,567,891.2314</span></span></pre></td></tr></table></figure>
+
+<p>6.trim():去除字符串首尾处的空白字符（或者其他字符）</p>
+<p>  <strong>函数格式</strong>：string <strong>trim</strong>  ( string <code>$str</code> [, string <code>$charlist</code> = “ \t\n\r\0\x0B”  ] )</p>
+<p>  此函数返回字符串 <code>str</code> 去除首尾空白字符后的结果。如果<strong>不指定第二个参数</strong>，<strong>trim()</strong> 将去除这些字符： </p>
+<ol>
+<li>“ “ (ASCII <em>32</em>         (<em>0x20</em>))，普通空格符。           </li>
+<li>“\t” (ASCII <em>9</em>          (<em>0x09</em>))，制表符。           </li>
+<li>“\n” (ASCII <em>10</em>       (<em>0x0A</em>))，换行符。           </li>
+<li>“\r” (ASCII <em>13</em>        (<em>0x0D</em>))，回车符。           </li>
+<li>“\0” (ASCII <em>0</em>         (<em>0x00</em>))，空字节符。           </li>
+<li>“\x0B” (ASCII <em>11</em>    (<em>0x0B</em>))，垂直制表符。</li>
+</ol>
+<p>例子：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$text   = <span class="string">"\t\tThese are a few words :) ...  "</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$binary = <span class="string">"\x09Example string\x0A"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$hello  = <span class="string">"Hello World"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">var_dump($text, $binary, $hello); <span class="comment">//string(32) "      These are a few words :) ...  "</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">                                  <span class="comment">//string(16) "   Example string</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                                  <span class="comment">//string(11) "Hello World"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">print</span> <span class="string">"\n"</span>;                    </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">$trimmed = trim($text);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">var_dump($trimmed);               <span class="comment">//string(28) "These are a few words :) ..."      </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">$trimmed = trim($text, <span class="string">" \t."</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">var_dump($trimmed);               <span class="comment">//string(24) "These are a few words :)"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">$trimmed = trim($hello, <span class="string">"Hdle"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">var_dump($trimmed);               <span class="comment">//string(5) "o Wor"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 清除 $binary 首位的 ASCII 控制字符</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// （包括 0-31）</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">$clean = trim($binary, <span class="string">"\x00..\x1F"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">var_dump($clean);                 <span class="comment">//string(14) "Example string"</span></span></pre></td></tr></table></figure>
+
+<p> 7.ltrim():和trim()相似<strong>区别是</strong>删除 开口的空白字符（其他字符）</p>
+<p> 8.rtrim():删除字符串末端的空白字符（或者其他字符）</p>
+<h6 id="数组处理函数"><a href="#数组处理函数" class="headerlink" title="数组处理函数"></a>数组处理函数</h6><ol>
+<li><p>array_keys():获得所有的<strong>键名</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$arr = <span class="keyword">array</span>(<span class="string">"one"</span>,<span class="string">"two"</span>,<span class="string">"three"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$arr1=array_keys($arr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">print_r($arr1);<span class="comment">//Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">// (</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//     [0] =&gt; 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//     [1] =&gt; 1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//     [2] =&gt; 2</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">// )</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>array_values()： 数组中所有的值并给其<strong>建立数字索引</strong>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$arr = <span class="keyword">array</span>(<span class="string">"aa"</span>=&gt;<span class="string">"one"</span>,<span class="string">"bb"</span>=&gt;<span class="string">"two"</span>,<span class="string">"cc"</span>=&gt;<span class="string">"three"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$arr1=array_values($arr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">print_r($arr1);<span class="comment">//Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">// (</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//     [0] =&gt; one</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//     [1] =&gt; two</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">//     [2] =&gt; three</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">               <span class="comment">// )</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>array_diff():计算数组的差集</p>
+<p><strong>说明</strong>：array <strong>array_diff</strong>    ( array <code>$array1</code>   , array <code>$array2</code>   [, array <code>$...</code>  ] )</p>
+<p>在  <code>array1</code> 中但是不在 <code>array2</code> 及任何其它参数数组中的值。 </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$array1 = <span class="keyword">array</span>(<span class="string">"a"</span> =&gt; <span class="string">"green"</span>, <span class="string">"red"</span>, <span class="string">"blue"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$array2 = <span class="keyword">array</span>(<span class="string">"b"</span> =&gt; <span class="string">"green"</span>, <span class="string">"yellow"</span>, <span class="string">"red"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$result = array_diff($array1, $array2);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">print_r($result); <span class="comment">//Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//    [1] =&gt; blue</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//)</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>array_intersect():计算数组的交集</p>
+<p><strong>说明：</strong>array <strong>array_intersect</strong>    ( array <code>$array1</code>   , array <code>$array2</code>   [, array <code>$ ...</code>  ] )</p>
+<p><strong>array_intersect()</strong> 返回一个数组，该数组包含了所有在      <code>array1</code> 中也同时出现在所有其它参数数组中的值。注意<strong>键名保留不变</strong>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$array1 = <span class="keyword">array</span>(<span class="string">"a"</span> =&gt; <span class="string">"green"</span>, <span class="string">"red"</span>, <span class="string">"blue"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$array2 = <span class="keyword">array</span>(<span class="string">"b"</span> =&gt; <span class="string">"green"</span>, <span class="string">"yellow"</span>, <span class="string">"red"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$result = array_intersect($array1, $array2);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">print_r($result); <span class="comment">//Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//[a] =&gt; green</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//[0] =&gt; red</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//)</span></span></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="5">
+<li><p>array_merge()：合并一个或多个数组</p>
+<ul>
+<li>数字键名将会重新编号</li>
+<li>将一个或多个数组的单元合并起来，一个数组中的值附加在前一个数组的后面。返回作为结果的数组。</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$array1 = <span class="keyword">array</span>(<span class="string">"color"</span> =&gt; <span class="string">"red"</span>, <span class="number">2</span>, <span class="number">4</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$array2 = <span class="keyword">array</span>(<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"color"</span> =&gt; <span class="string">"green"</span>, <span class="string">"shape"</span> =&gt; <span class="string">"trapezoid"</span>, <span class="number">4</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$result = array_merge($array1, $array2);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">print_r($result);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [color] =&gt; green</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [0] =&gt; 2</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [1] =&gt; 4</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [2] =&gt; a</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [3] =&gt; b</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [shape] =&gt; trapezoid</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [4] =&gt; 4</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> */</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>array_merge_recursive():递归地合并一个或多个数组</p>
+<ul>
+<li>将一个或多个数组的单元合并起来，一个数组中的值附加在前一个数组的后面。返回作为结果的数组。</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ar1 = <span class="keyword">array</span>(<span class="string">"color"</span> =&gt; <span class="keyword">array</span>(<span class="string">"favorite"</span> =&gt; <span class="string">"red"</span>), <span class="number">5</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$ar2 = <span class="keyword">array</span>(<span class="number">10</span>, <span class="string">"color"</span> =&gt; <span class="keyword">array</span>(<span class="string">"favorite"</span> =&gt; <span class="string">"green"</span>, <span class="string">"blue"</span>));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">$result = array_merge_recursive($ar1, $ar2);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">print_r($result);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [color] =&gt; Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *        (</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *            [favorite] =&gt; Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *                (</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *                    [0] =&gt; red</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *                    [1] =&gt; green</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *                )</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *            [0] =&gt; blue</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *        )</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [0] =&gt; 5</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *    [1] =&gt; 10</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> *)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> */</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>array_shift()：将数组的第一个单元移出并作为结果返回，将      <code>array</code> 的长度减一并将所有其它单元向前移动一位。所有的<strong>数字键名</strong>将改为<strong>从零开始计数</strong>，<strong>文字键名将不变</strong>。 </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$stack = <span class="keyword">array</span>(<span class="string">"orange"</span>, <span class="string">"banana"</span>, <span class="string">"apple"</span>, <span class="string">"raspberry"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$fruit = array_shift($stack);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">print_r($stack);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*    [0] =&gt; banana</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*    [1] =&gt; apple</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*    [2] =&gt; raspberry</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*)</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>array_unshift()</p>
+<ul>
+<li><p>将传入的单元插入到      <code>array</code> 数组的开头。注意单元是作为整体被插入的，因此传入单元将保持同样的顺序。所有的<strong>数值键名</strong>将修改为<strong>从零开始重新计数</strong>，所有的<strong>文字键名保持不变</strong>。 </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$queue = <span class="keyword">array</span>(<span class="string">"orange"</span>, <span class="string">"banana"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">array_unshift($queue, <span class="string">"apple"</span>, <span class="string">"raspberry"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">print_r($queue);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">                <span class="comment">/*Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment">                /*(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">                /*    [0] =&gt; apple</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">                /*    [1] =&gt; raspberry</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">                /*    [2] =&gt; orange</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment">                /*    [3] =&gt; banana</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment">                /*)</span></span></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ol>
+<ol start="9">
+<li><p>array_pop()：弹出并返回      <code>array</code> 数组的最后一个单元，并将数组     <code>array</code> 的长度减一。如果   <code>array</code> <strong>为空（或者不是数组）</strong>将返回 <strong><code>NULL</code></strong>。 此外如果被调用<strong>不是一个数</strong>则会产生一个 <a href="">Warning</a>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$stack = <span class="keyword">array</span>(<span class="string">"orange"</span>, <span class="string">"banana"</span>, <span class="string">"apple"</span>, <span class="string">"raspberry"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">$fruit = array_pop($stack);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">print_r($stack);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">  (</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      [0] =&gt; orange</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      [1] =&gt; banana</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment">      [2] =&gt; apple</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment">  )</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> */</span></span></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="10">
+<li><p>array_push()：将   <code>array</code> 当成一个栈，并将传入的变量压入   <code>array</code> 的<strong>末尾</strong>。<code>array</code>   的长度将根据入栈变量的数目增加。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$stack = <span class="keyword">array</span>(<span class="string">"orange"</span>, <span class="string">"banana"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">array_push($stack, <span class="string">"apple"</span>, <span class="string">"raspberry"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">print_r($stack);<span class="comment">//Array</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">                <span class="comment">//(</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">                <span class="comment">//[0] =&gt; orange</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                <span class="comment">//[1] =&gt; banana</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                <span class="comment">//[2] =&gt; apple</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">                <span class="comment">//[3] =&gt; raspberry</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">                <span class="comment">//)</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>sort()：对数组进行排序</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$fruits = <span class="keyword">array</span>(<span class="string">"lemon"</span>, <span class="string">"orange"</span>, <span class="string">"banana"</span>, <span class="string">"apple"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">sort($fruits);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span> ($fruits <span class="keyword">as</span> $key =&gt; $val) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">echo</span> <span class="string">"fruits["</span> . $key . <span class="string">"] = "</span> . $val . <span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*fruits[0] = apple</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">  fruits[1] = banana</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">  fruits[2] = lemon</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment">  fruits[3] = orange</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment">*/</span></span></pre></td></tr></table></figure>
+
+<p>12.asort()：对数组进行排序并保持索引关系</p>
+</li>
+</ol>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$fruits = <span class="keyword">array</span>(<span class="string">"d"</span> =&gt; <span class="string">"lemon"</span>, <span class="string">"a"</span> =&gt; <span class="string">"orange"</span>, <span class="string">"b"</span> =&gt; <span class="string">"banana"</span>, <span class="string">"c"</span> =&gt; <span class="string">"apple"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">asort($fruits);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span> ($fruits <span class="keyword">as</span> $key =&gt; $val) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">echo</span> <span class="string">"$key = $val\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * c = apple</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * b = banana</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * d = lemon</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * a = orange</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> */</span></span></pre></td></tr></table></figure>
+
+<p>12.arsort()：对数组进行逆排序并保持索引关系 </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$fruits = <span class="keyword">array</span>(<span class="string">"d"</span> =&gt; <span class="string">"lemon"</span>, <span class="string">"a"</span> =&gt; <span class="string">"orange"</span>, <span class="string">"b"</span> =&gt; <span class="string">"banana"</span>, <span class="string">"c"</span> =&gt; <span class="string">"apple"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">arsort($fruits);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span> ($fruits <span class="keyword">as</span> $key =&gt; $val) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">echo</span> <span class="string">"$key = $val\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * a = orange</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * d = lemon</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * b = banana</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> * c = apple</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment"> */</span></span></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/php/" rel="tag"><i class="fa fa-tag"></i> php</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/03/28-mysql/" rel="prev" title="网站项目测试接口时MySQL的sort和limit结合出现的问题">
+      <i class="fa fa-chevron-left"></i> 网站项目测试接口时MySQL的sort和limit结合出现的问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/05/30-js%E9%9D%A2%E5%83%8F%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" rel="next" title="Javascript面向对象编程">
+      Javascript面向对象编程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#变量的作用域和静态变量"><span class="nav-number">1.</span> <span class="nav-text">变量的作用域和静态变量</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#静态变量"><span class="nav-number">1.1.</span> <span class="nav-text">静态变量</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP函数"><span class="nav-number">2.</span> <span class="nav-text">PHP函数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#函数的参数"><span class="nav-number">2.1.</span> <span class="nav-text">函数的参数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#函数的返回值"><span class="nav-number">2.2.</span> <span class="nav-text">函数的返回值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#函数引用的返回"><span class="nav-number">2.3.</span> <span class="nav-text">函数引用的返回</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#系统内置函数"><span class="nav-number">2.4.</span> <span class="nav-text">系统内置函数</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#时间日期函数"><span class="nav-number">2.4.1.</span> <span class="nav-text">时间日期函数</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#IP处理函数"><span class="nav-number">2.4.2.</span> <span class="nav-text">IP处理函数</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#打印函数"><span class="nav-number">2.4.3.</span> <span class="nav-text">打印函数</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#序列化和反序列化"><span class="nav-number">2.4.4.</span> <span class="nav-text">序列化和反序列化</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#字符串处理函数"><span class="nav-number">2.4.5.</span> <span class="nav-text">字符串处理函数</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#数组处理函数"><span class="nav-number">2.4.6.</span> <span class="nav-text">数组处理函数</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

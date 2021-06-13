@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言&amp;emsp;&amp;emsp;今天把MySQL的相关优化简单做了一些总结，包括如何定位查询比较慢的语句，通过profile、慢查询日志、processlist、show status等操作,找到具体要优化的语句，找到具体慢的过程进行优化。">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL优化">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;22&#x2F;40-mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;今天把MySQL的相关优化简单做了一些总结，包括如何定位查询比较慢的语句，通过profile、慢查询日志、processlist、show status等操作,找到具体要优化的语句，找到具体慢的过程进行优化。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-8.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-12.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-3.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-4.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-5.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-6.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-7.png">
+<meta property="og:updated_time" content="2020-05-25T01:40:08.557Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;xy.liruoning.cn&#x2F;images&#x2F;40-mysql-8.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/22/40-mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>MySQL优化 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/22/40-mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          MySQL优化
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-22 00:00:00" itemprop="dateCreated datePublished" datetime="2020-02-22T00:00:00+08:00">2020-02-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-25 09:40:08" itemprop="dateModified" datetime="2020-05-25T09:40:08+08:00">2020-05-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/02/22/40-mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/22/40-mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>&emsp;&emsp;今天把MySQL的相关优化简单做了一些总结，包括如何定位查询比较慢的语句，通过profile、慢查询日志、processlist、show status等操作,找到具体要优化的语句，找到具体慢的过程进行优化。</p>
+<a id="more"></a>
+<h4 id="查找需要优化的语句"><a href="#查找需要优化的语句" class="headerlink" title="查找需要优化的语句"></a>查找需要优化的语句</h4><h5 id="慢查询日志"><a href="#慢查询日志" class="headerlink" title="慢查询日志"></a>慢查询日志</h5><p>记录<strong>慢查询日志</strong>（可以借助pt-query-digest工具来分析）：是MySQL提供的一种日志用于存储<strong>执行时间超过某个界限的sql语句</strong>，在MySQL中默认是没有开启慢查询日志的，即使开启了这个界限也是默认的10秒。</p>
+<p><strong>开启MySQL慢查询日志</strong></p>
+<p>方法一：<br>先关闭mysql，再以安全模式启动<br><code>mysqld.exe --safe-mode --slow-query-log</code> 开启慢查询日志 对于–safe-mode 已经废弃在低版本可以有，高版本就不加了。</p>
+<p><img src="http://xy.liruoning.cn/images/40-mysql-8.png" alt=""></p>
+<p>方法二（修改MySQL配置长期开启）：</p>
+<p>进入mysql.ini文件在<code>[mysqld]</code>添加下面两条语句。</p>
+<p>①slow_query_log=1 开启慢查询日志<br>②slow_query_log_file=”你的慢查询日志的路径” (这里有一个坑如果在window系统的话提前建好目录，Linux应该给予相应的权限)<br>③long_query_time=10 慢查询阈值，当查询时间多于设定的阈值时，该SQL会被记录日志中或者数据表中</p>
+<p><strong>查询慢查询日志的时间</strong>&amp;<strong>设置边界记录时间</strong></p>
+<p>查看时间：<code>show variables like &quot;%long_query_time%&quot;</code></p>
+<p>设置时间： <code>set long_query_time=0.05</code> 命令设置边界时间。</p>
+<p><strong>慢查询日志文件的位置&amp;查询日志的sql写入</strong></p>
+<p>用以下语句来查询慢查询日志的存储位置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like &quot;%slow_query_log_file%&quot;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">| slow_query_log_file | D:\DESKTOP-ICVGFU3-slow.log</span></pre></td></tr></table></figure>
+
+<p>下面是我做的慢查询写入测试</p>
+<p>看一看出看到那个数据库那条语句满了。</p>
+<p><img src="http://xy.liruoning.cn/images/40-mysql-12.png" alt=""></p>
+<h5 id="show-profile查找SQL精确的记录时间"><a href="#show-profile查找SQL精确的记录时间" class="headerlink" title="show profile查找SQL精确的记录时间"></a>show profile查找SQL精确的记录时间</h5><p>​    set profiling=1;开启 ，服务器上执行的所有语句会检测消耗的时间，存到临时表。</p>
+<p>​     通过查询临时表的主键ID来分析那一条语句发生了慢的操作</p>
+<p>​     <img src="http://xy.liruoning.cn/images/40-mysql-1.png" alt=""></p>
+<p>​     首选打开 profiling它会将我们的 查询记录存入到临时表</p>
+<p>​     然后我进行了下面的三次操作，当然主要还是分析的第三次的<code>select</code>查询</p>
+<img src="http://xy.liruoning.cn/images/40-mysql-2.png" style="zoom:50%;" /> 
+
+<p>  然后show profiles; 来查询 profiles临时表</p>
+ <img src="http://xy.liruoning.cn/images/40-mysql-3.png" style="zoom:67%;" />
+
+<p>通过 show profile for query ID 来查询具体语句的执行时间</p>
+ <img src="http://xy.liruoning.cn/images/40-mysql-4.png" style="zoom:67%;" />
+
+<p> PS：上边我只是举了一个简单的例子如果实地的去分析，好要理解具体时间的浪费地点。</p>
+<h5 id="show-status-来查看数据库的状态"><a href="#show-status-来查看数据库的状态" class="headerlink" title="show status 来查看数据库的状态"></a>show status 来查看数据库的状态</h5><p>show status 会返回一些计数器，show global status 查看服务器级别的所有计数</p>
+<p>有时候可以根据这些基数猜出那些操作代价较高或者消耗时间多。</p>
+<p>​    <img src="http://xy.liruoning.cn/images/40-mysql-5.png" style="zoom:67%;" /></p>
+<p>​     以上是两个例子，其实好友很多goole || baidu 都可以查询得到。</p>
+<h5 id="show-processlist"><a href="#show-processlist" class="headerlink" title="show processlist"></a>show processlist</h5><p>①观察现在所有连接的连接状态</p>
+<p>②观察是否有大量的线程处于不正常的状态或者特征。</p>
+   <img src="http://xy.liruoning.cn/images/40-mysql-6.png" style="zoom:67%;" />
+
+<h5 id="explain-分析单条SQL语句"><a href="#explain-分析单条SQL语句" class="headerlink" title="explain 分析单条SQL语句"></a>explain 分析单条SQL语句</h5>   <img src="http://xy.liruoning.cn/images/40-mysql-7.png" style="zoom:67%;" />
+
+<p><code>id:</code>查询的编号，一般有子查询才会递增</p>
+<p><code>select_type</code>有以下几个值:</p>
+<ol>
+<li>simple:不含子查询单表查询</li>
+<li>primary:含子查询或派生查询</li>
+<li>derived:from性的子查询</li>
+<li>subquery：除了from字句中包含的子查询外，其他地方出现的子查询都可能是subquery</li>
+<li>union： UNION中的第二个或后面的SELECT语句</li>
+<li>union result : UNION的结果</li>
+</ol>
+<p><code>table:</code> 查询针对的表</p>
+<p>partitions:版本5.7以前，该项是explain partitions显示的选项，5.7以后成为了默认选项。该列显示的为分区表命中的分区情况。非分区表该字段为空（null）。</p>
+<p><code>type:</code>依次从好到差：system，const，eq_ref，ref，fulltext，ref_or_null，index_merge，unique_subquery，index_subquery，range，index，ALL，除了all之外，其他的type都可以使用到索引，除了index_merge之外，其他的type只可以用到一个索引。</p>
+<p>A：system：表中只有一行数据或者是空表，且只能用于myisam和memory表。如果是Innodb引擎表，type列在这个情况通常都是all或者index<br> B：const：使用唯一索引或者主键，返回记录一定是1行记录的等值where条件时，通常type是const。其他数据库也叫做唯一索引扫描<br> C：eq_ref：出现在要连接过个表的查询计划中，驱动表只返回一行数据，且这行数据是第二个表的主键或者唯一索引，且必须为not null，唯一索引和主键是多列时，只有所有的列都用作比较时才会出现eq_ref<br> D：ref：不像eq_ref那样要求连接顺序，也没有主键和唯一索引的要求，只要使用相等条件检索时就可能出现，常见与辅助索引的等值查找。或者多列主键、唯一索引中，使用第一个列之外的列作为等值查找也会出现，总之，返回数据不唯一的等值查找就可能出现。<br> E：fulltext：全文索引检索，要注意，全文索引的优先级很高，若全文索引和普通索引同时存在时，mysql不管代价，优先选择使用全文索引<br> F：ref_or_null：与ref方法类似，只是增加了null值的比较。实际用的不多。<br> 例如：<br> SELECT * FROM ref_table<br> WHERE key_column=expr OR key_column IS NULL;<br> G：index_merge：表示查询使用了两个以上的索引，最后取交集或者并集，常见and ，or的条件使用了不同的索引，官方排序这个在ref_or_null之后，但是实际上由于要读取所个索引，性能可能大部分时间都不如range<br> H：unique_subquery：用于where中的in形式子查询，子查询返回不重复值唯一值<br> I：index_subquery：用于in形式子查询使用到了辅助索引或者in常数列表，子查询可能返回重复值，可以使用索引将子查询去重。<br> J：range：索引范围扫描，常见于使用 =, &lt;&gt;, &gt;, &gt;=, &lt;, &lt;=, IS NULL, &lt;=&gt;, BETWEEN, IN()或者like等运算符的查询中。<br> K：index：索引全表扫描，把索引从头到尾扫一遍，常见于使用索引列就可以处理不需要读取数据文件的查询、可以使用索引排序或者分组的查询。按照官方文档的说法：</p>
+<p><code>possible_keys:</code>查询可能使用到的索引都会在这里列出来</p>
+<p><code>key:</code>查询真正使用到的索引</p>
+<p><code>key_len:</code> 查询使用到的索引长度（具体使用多少列的索引这里就会算进去）</p>
+<p><code>ref:</code>如果是等值查询这里显示const,如果是连接查询，被驱动表的执行计划这里会显示驱动表的关联字段，如果是条件使用了表达式或者函数，或者条件列发生了内部隐式转换，这里可能显示为func</p>
+<p><code>row:</code>这里是执行计划中估算的扫描行数，不是精确值</p>
+<p><code>filtered:</code>使用explain extended时会出现这个列，5.7之后的版本默认就有这个字段，不需要使用explain extended了。这个字段表示存储引擎返回的数据在server层过滤后，剩下多少满足查询的记录数量的比例，注意是百分比，不是具体记录数。</p>
+<p><code>extra:</code> 尽量不要出现 using filesort和using temporary</p>
+<p>A：distinct：在select部分使用了distinc关键字<br>B：no tables used：不带from字句的查询或者From dual查询<br>C：使用not in()形式子查询或not exists运算符的连接查询，这种叫做反连接。即，一般连接查询是先查询内表，再查询外表，反连接就是先查询外表，再查询内表。<br>D：using filesort：排序时无法使用到索引时，就会出现这个。常见于order by和group by语句中<br>E：using index：查询时不需要回表查询，直接通过索引就可以获取查询的数据。<br>F：using join buffer（block nested loop），using join buffer（batched key accss）：5.6.x之后的版本优化关联查询的BNL，BKA特性。主要是减少内表的循环数量以及比较顺序地扫描查询。</p>
+<blockquote>
+<p>参考链接：<a href="https://www.jianshu.com/p/73f2c8448722" target="_blank" rel="noopener">https://www.jianshu.com/p/73f2c8448722</a>  这位作者讲的超级详细感谢</p>
+</blockquote>
+<h4 id="优化查询过程中的数据访问"><a href="#优化查询过程中的数据访问" class="headerlink" title="优化查询过程中的数据访问"></a>优化查询过程中的数据访问</h4><p>① 是否在查询过程中检索到了大量不需要的数据，不需要的<strong>行</strong>或者<strong>列</strong> 可以用l<strong>imit</strong> 解决</p>
+<p>②查询过程中尽量指定列名 A.id A.name B.id</p>
+<p>③<strong>重复查询</strong>相同的语句我们可以使用缓存，缓存相应的数据，下次直接读取缓存。</p>
+<p>④在explain中分析是否扫描了额外的记录行（如果需要少量的记录扫描了大量的记录行。</p>
+<p>​    <strong>解决：</strong> 可以使用索引覆盖，这样存储引擎不需要回表获取对应的行就可以返回结果。</p>
+<p>⑤有的时候我们也可以牺牲我们的空间来换取时间。</p>
+<p>​    例：有的时候我们经常会关联另一个表来查询另一个表的一个字段。这时候我们可以将这个字段存储到另一个表中，这样就不用连表查询了，虽然牺牲了一点空间。</p>
+<h4 id="优化长难的查询语句"><a href="#优化长难的查询语句" class="headerlink" title="优化长难的查询语句"></a>优化长难的查询语句</h4><p><strong>一个复杂查询和多个简单查询</strong></p>
+<p>   例：MySQL每秒钟可以扫描上百万条数据，但是响应给客户端的速度却不是很快。这时我们可能就需要把一个复杂的查询分割成多个小的查询也是很有必要的。</p>
+<p><strong>分解关联查询</strong></p>
+<p>将一条关联语句分解成多个SQL语句的查询来中</p>
+<ol>
+<li>缓存效率更高</li>
+<li>执行单个查询可以减少锁的竞争</li>
+<li>在应用层做关联更容易对数据库进行拆分</li>
+</ol>
+<h4 id="优化特定类型的查询语句"><a href="#优化特定类型的查询语句" class="headerlink" title="优化特定类型的查询语句"></a>优化特定类型的查询语句</h4><ol>
+<li><p><code>count()</code> :count(*)中的*是忽略所有行直接统计所有的行数，不要使用count(列名)来代替。</p>
+<p>对于MyISAM引擎 count(*) 是非常快的 在没有where的条件下，如果有where 可以使用explain来近似的代替count(*)</p>
+</li>
+<li><p>确定 <strong>ON</strong> 或者 <strong>USING</strong> 子句列有索引</p>
+</li>
+<li><p><strong>group by</strong> 和 <strong>order by</strong> 只有一个表的列 这样MySQL才可以使用到索引</p>
+</li>
+<li><p>优化<strong>group by</strong> 和<strong>distinct</strong></p>
+<p>1)索引优化，效果好</p>
+<p>2)使用标识列进行分组效率更高</p>
+<p>3) 如果不需要order by 进行 group by 时使用 order by NULL ,MySQL就不会进行文件排序</p>
+</li>
+<li><p><strong>LIMIT</strong> 偏移量大的时候，查询效率较低</p>
+<p>我们可以记录上一次查询的最大ID,下次查询的时候直接根据ID来查询。</p>
+</li>
+<li><p><strong>UNION</strong> 尽量有 <strong>UNION ALL</strong> 来代替</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/22/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E6%B3%95/" rel="prev" title="PHP实现二分查找法（递归&非递归）">
+      <i class="fa fa-chevron-left"></i> PHP实现二分查找法（递归&非递归）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/23/49-lnmp/" rel="next" title="从官网下载安装包，到搭建完成lnmp环境">
+      从官网下载安装包，到搭建完成lnmp环境 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查找需要优化的语句"><span class="nav-number">2.</span> <span class="nav-text">查找需要优化的语句</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#慢查询日志"><span class="nav-number">2.1.</span> <span class="nav-text">慢查询日志</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#show-profile查找SQL精确的记录时间"><span class="nav-number">2.2.</span> <span class="nav-text">show profile查找SQL精确的记录时间</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#show-status-来查看数据库的状态"><span class="nav-number">2.3.</span> <span class="nav-text">show status 来查看数据库的状态</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#show-processlist"><span class="nav-number">2.4.</span> <span class="nav-text">show processlist</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#explain-分析单条SQL语句"><span class="nav-number">2.5.</span> <span class="nav-text">explain 分析单条SQL语句</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化查询过程中的数据访问"><span class="nav-number">3.</span> <span class="nav-text">优化查询过程中的数据访问</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化长难的查询语句"><span class="nav-number">4.</span> <span class="nav-text">优化长难的查询语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化特定类型的查询语句"><span class="nav-number">5.</span> <span class="nav-text">优化特定类型的查询语句</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>

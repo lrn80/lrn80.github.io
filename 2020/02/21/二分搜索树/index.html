@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="BzMASWBXA3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言&amp;emsp;&amp;emsp;这一篇bolg主要讲述了二分搜索树，在功能上主要完成了在树中添加元素，前（使用了递归和非递归）、中、后序的遍历、广度优先搜索主要用到的是队列的特性（先进先出）。删除某个元素等操作。通过将这些功能的实现，对递归和非递归有了新的理解👨，这次实现链表的基本操作，关键的地方都写了注释，希望发表你的想法我们共同学习。">
+<meta name="keywords" content="算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP实现二分搜索树基础">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;21&#x2F;%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2%E6%A0%91&#x2F;index.html">
+<meta property="og:site_name" content="lrn&#39;s blog">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;这一篇bolg主要讲述了二分搜索树，在功能上主要完成了在树中添加元素，前（使用了递归和非递归）、中、后序的遍历、广度优先搜索主要用到的是队列的特性（先进先出）。删除某个元素等操作。通过将这些功能的实现，对递归和非递归有了新的理解👨，这次实现链表的基本操作，关键的地方都写了注释，希望发表你的想法我们共同学习。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-21T12:35:27.388Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/21/%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2%E6%A0%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>PHP实现二分搜索树基础 | lrn's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="lrn's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lrn's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/21/%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2%E6%A0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpeg">
+      <meta itemprop="name" content="lrn">
+      <meta itemprop="description" content="刻意练习，精益求精">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lrn's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          PHP实现二分搜索树基础
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-02-21 00:00:00 / 修改时间：20:35:27" itemprop="dateCreated datePublished" datetime="2020-02-21T00:00:00+08:00">2020-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+            </span>
+
+           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/02/21/%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2%E6%A0%91/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/21/%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2%E6%A0%91/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>&emsp;&emsp;这一篇bolg主要讲述了二分搜索树，在功能上主要完成了在树中<strong>添加元素</strong>，<strong>前（使用了递归和非递归）、中、后序的遍历</strong>、<strong>广度优先搜索</strong>主要用到的是队列的特性（先进先出）。<strong>删除某个元素</strong>等操作。通过将这些功能的实现，对递归和非递归有了新的理解👨，这次实现链表的基本操作，关键的地方都写了注释，希望发表你的想法我们共同学习。</p>
+<a id="more"></a>
+<h4 id="具体的代码实现"><a href="#具体的代码实现" class="headerlink" title="具体的代码实现"></a>具体的代码实现</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">   <span class="keyword">public</span> $e;   <span class="comment">//存储数据</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">   <span class="keyword">public</span> $left; <span class="comment">// Node 存储左节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">   <span class="keyword">public</span> $right; <span class="comment">// Node 存储右节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($e)</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;e=$e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;left=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;right=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="string">"../list/linkStack.php"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="string">"../list/LinkListQueue.php"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">linkStack</span>\<span class="title">linkStack</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">LinkListQueue</span>\<span class="title">LinkListQueue</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BST</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span> $root; <span class="comment">//根元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span>  $size; <span class="comment">//有多少个元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;root = <span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;size=<span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//当前存储元素的个数</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getSize</span><span class="params">()</span>: <span class="title">int</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span>  <span class="keyword">$this</span>-&gt;size;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//判断是否为空</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">isEmpty</span><span class="params">()</span>:<span class="title">bool</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;size==<span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">add</span><span class="params">($e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;root=<span class="keyword">$this</span>-&gt;addNoRoot(<span class="keyword">$this</span>-&gt;root,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">addNoRoot</span><span class="params">($Node,$e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        if($Node-&gt;e==$e)&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">39</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            return;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">40</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">41</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        if($Node-&gt;e &gt; $e&amp;&amp;$Node-&gt;left==null)&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">42</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $Node-&gt;left = new Node($e);</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">43</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;size++;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">44</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            return;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">45</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;else&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">46</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;addNoRoot($Node-&gt;left,$e);</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">47</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">48</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        if($Node-&gt;e &lt; $e&amp;&amp;$Node-&gt;right==null)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">49</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">50</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $Node-&gt;right=new Node($e);</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">51</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;size++;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">52</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            return;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">53</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;else&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">54</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;addNoRoot($Node-&gt;right,$e);</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">55</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">56</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">57</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;size++;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">58</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Node($e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">59</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">60</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e &gt;$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">61</span></pre></td><td class="code"><pre><span class="line">            $Node-&gt;left=<span class="keyword">$this</span>-&gt;addNoRoot($Node-&gt;left,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">62</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">63</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e &lt; $e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">64</span></pre></td><td class="code"><pre><span class="line">            $Node-&gt;right=<span class="keyword">$this</span>-&gt;addNoRoot($Node-&gt;right,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">65</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">66</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> $Node;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">67</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">68</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//前序遍历</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">69</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">prevOrder</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">70</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;prevOrderNode(<span class="keyword">$this</span>-&gt;root);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">71</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">72</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">prevOrderNode</span><span class="params">($Node)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">73</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">74</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">75</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">76</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> $Node-&gt;e.<span class="string">" "</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">77</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;prevOrderNode($Node-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">78</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;prevOrderNode($Node-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">79</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">80</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//前序遍历的非递归写法</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">81</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">prevOrderNR</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">82</span></pre></td><td class="code"><pre><span class="line">        $stack = <span class="keyword">new</span> linkStack();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">83</span></pre></td><td class="code"><pre><span class="line">        $stack-&gt;push(<span class="keyword">$this</span>-&gt;root); <span class="comment">//先将根节点压入栈</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">84</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">while</span>(!$stack-&gt;isEmpty())&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">85</span></pre></td><td class="code"><pre><span class="line">             $top=$stack-&gt;peek();  <span class="comment">//if 栈不为空获得栈顶元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">86</span></pre></td><td class="code"><pre><span class="line">                 $stack-&gt;pop();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">87</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">echo</span> $top-&gt;e.<span class="string">" "</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">88</span></pre></td><td class="code"><pre><span class="line">                 <span class="keyword">if</span>($top-&gt;right!=<span class="keyword">null</span>)&#123;       <span class="comment">//因为栈是后入先出的所以先压入右孩子，在压入左孩子</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">89</span></pre></td><td class="code"><pre><span class="line">                     $stack-&gt;push($top-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">90</span></pre></td><td class="code"><pre><span class="line">                 &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">91</span></pre></td><td class="code"><pre><span class="line">                 <span class="keyword">if</span>($top-&gt;left!=<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">92</span></pre></td><td class="code"><pre><span class="line">                     $stack-&gt;push($top-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">93</span></pre></td><td class="code"><pre><span class="line">                 &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">94</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">95</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">96</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//中序遍历</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">97</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">inOrder</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">98</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;inOrderNode(<span class="keyword">$this</span>-&gt;root);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">99</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">100</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">inOrderNode</span><span class="params">($Node)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">101</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">102</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> ;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">103</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">104</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;inOrderNode($Node-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">105</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> $Node-&gt;e.<span class="string">" "</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">106</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;inOrderNode($Node-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">107</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">108</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//后续遍历</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">109</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">postOrder</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">110</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;postOrderNode(<span class="keyword">$this</span>-&gt;root);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">111</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">112</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">postOrderNode</span><span class="params">($Node)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">113</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">114</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> ;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">115</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">116</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;postOrderNode($Node-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">117</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;postOrderNode($Node-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">118</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> $Node-&gt;e.<span class="string">" "</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">119</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">120</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//广度优先遍历（层序遍历）</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">121</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//主要利用了队列的特性</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">122</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">levelOrder</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">123</span></pre></td><td class="code"><pre><span class="line">        $Queue=<span class="keyword">new</span> LinkListQueue();   <span class="comment">//队列类</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">124</span></pre></td><td class="code"><pre><span class="line">        $Queue-&gt;enqueue(<span class="keyword">$this</span>-&gt;root);  <span class="comment">//将根节点入队</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">125</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">while</span> (!$Queue-&gt;isEmpty())&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">126</span></pre></td><td class="code"><pre><span class="line">            $front=$Queue-&gt;getFront(); <span class="comment">//获得队首元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">127</span></pre></td><td class="code"><pre><span class="line">            $Queue-&gt;dequeue();        <span class="comment">//进行出队操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">128</span></pre></td><td class="code"><pre><span class="line">             <span class="keyword">echo</span> $front-&gt;e.<span class="string">" "</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">129</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(!is_null($front-&gt;left))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">130</span></pre></td><td class="code"><pre><span class="line">                $Queue-&gt;enqueue($front-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">131</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">132</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(!is_null($front-&gt;right))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">133</span></pre></td><td class="code"><pre><span class="line">                $Queue-&gt;enqueue($front-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">134</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">135</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">136</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">137</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//找到最小元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">138</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">mininum</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">139</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;size==<span class="number">0</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">140</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">echo</span> <span class="string">"二分搜索树的值为空"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">141</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">142</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">143</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;mininumR(<span class="keyword">$this</span>-&gt;root)-&gt;e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">144</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">145</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">mininumR</span><span class="params">($root)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">146</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($root-&gt;left==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">147</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $root;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">148</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">149</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;mininumR($root-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">150</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">151</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">152</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">removeMin</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">153</span></pre></td><td class="code"><pre><span class="line">        $ret=<span class="keyword">$this</span>-&gt;mininum();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">154</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;root=<span class="keyword">$this</span>-&gt;removeMinR(<span class="keyword">$this</span>-&gt;root);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">155</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">156</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">157</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//删除最小的元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">158</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//下面提供了两种思路① 分别判断要删除的节点是否含有右子树然后再分别处理</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">159</span></pre></td><td class="code"><pre><span class="line">                  <span class="comment">//② 如果左子树为空 直接返回 此时的右子树 把当时Node赋值为null（这是因为不管是否有右子树返回当时的根节点就可以如果没有右子树自然返回null）</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">160</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">removeMinR</span><span class="params">($Node)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">161</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        if(is_null($Node-&gt;left)&amp;&amp;(!is_null($Node-&gt;right)))&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">162</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $curNode=$Node;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">163</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $Node=$Node-&gt;right;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">164</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $curNode=null;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">165</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;size--;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">166</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            return $Node;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">167</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">168</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        if(is_null($Node-&gt;left)&amp;&amp;is_null($Node-&gt;right))&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">169</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $Node=null;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">170</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;size--;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">171</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            return $Node;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">172</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">173</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">174</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">175</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>(is_null($Node-&gt;left))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">176</span></pre></td><td class="code"><pre><span class="line">            $rightNode=$Node-&gt;right;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">177</span></pre></td><td class="code"><pre><span class="line">            $Node=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">178</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">179</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $rightNode;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">180</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">181</span></pre></td><td class="code"><pre><span class="line">        $Node-&gt;left=<span class="keyword">$this</span>-&gt;removeMinR($Node-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">182</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> $Node;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">183</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">184</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">185</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//找到最大元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">186</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">maxnum</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">187</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;size==<span class="number">0</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">188</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">echo</span> <span class="string">"二分搜索树的值为空"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">189</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">190</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">191</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;maxnumR(<span class="keyword">$this</span>-&gt;root)-&gt;e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">192</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">193</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">maxnumR</span><span class="params">($root)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">194</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($root-&gt;right==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">195</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $root;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">196</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">197</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;maxnumR($root-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">198</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">199</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">removeMAX</span><span class="params">()</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">200</span></pre></td><td class="code"><pre><span class="line">        $ret=<span class="keyword">$this</span>-&gt;maxnum();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">201</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;root=<span class="keyword">$this</span>-&gt;removeMaxR(<span class="keyword">$this</span>-&gt;root);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">202</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">203</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">204</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//删除最大数 ，这个和删除最小的数 思路是一样的只不过 是找右子树</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">205</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">removeMaxR</span><span class="params">($Node)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">206</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        if(!is_null($Node-&gt;left)&amp;&amp;(is_null($Node-&gt;right)))&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">207</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $curNode=$Node;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">208</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $Node=$Node-&gt;left;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">209</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $curNode=null;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">210</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;size--;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">211</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            return $Node;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">212</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">213</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        if(is_null($Node-&gt;left)&amp;&amp;is_null($Node-&gt;right))&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">214</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $Node=null;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">215</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            $this-&gt;size--;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">216</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//            return $Node;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">217</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">218</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//        &#125;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">219</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">220</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>(is_null($Node-&gt;right))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">221</span></pre></td><td class="code"><pre><span class="line">            $leftNode=$Node-&gt;left;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">222</span></pre></td><td class="code"><pre><span class="line">            $Node=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">223</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">224</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $leftNode;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">225</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">226</span></pre></td><td class="code"><pre><span class="line">        $Node-&gt;right=<span class="keyword">$this</span>-&gt;removeMaxR($Node-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">227</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> $Node;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">228</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">229</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//删除掉节点 e</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">230</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">// 以查找后继节点来代替当前节点来删除</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">231</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">removeuccessor</span><span class="params">($e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">232</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;root = <span class="keyword">$this</span>-&gt;removeR(<span class="keyword">$this</span>-&gt;root,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">233</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;root;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">234</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">235</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">removeR</span><span class="params">($Node,$e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">236</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">237</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">238</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">239</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e&lt;$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">240</span></pre></td><td class="code"><pre><span class="line">          $Node-&gt;right=<span class="keyword">$this</span>-&gt;removeR($Node-&gt;right,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">241</span></pre></td><td class="code"><pre><span class="line">          <span class="keyword">return</span> $Node;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">242</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">243</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e&gt;$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">244</span></pre></td><td class="code"><pre><span class="line">           $Node-&gt;left=<span class="keyword">$this</span>-&gt;removeR($Node-&gt;left,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">245</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">return</span> $Node;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">246</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">247</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e==$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">248</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(is_null($Node-&gt;left))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">249</span></pre></td><td class="code"><pre><span class="line">                $rightNode=$Node-&gt;right;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">250</span></pre></td><td class="code"><pre><span class="line">                $Node=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">251</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">252</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">return</span> $rightNode;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">253</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">254</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(is_null($Node-&gt;right))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">255</span></pre></td><td class="code"><pre><span class="line">                $leftNode = $Node-&gt;left;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">256</span></pre></td><td class="code"><pre><span class="line">                $Node=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">257</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">258</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">return</span> $leftNode;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">259</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">260</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">//如果左右子树都不为空</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">261</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">// ① 找到右子树的最小值（要删除节点 的后继节点）并删除</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">262</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">// 生成后继节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">263</span></pre></td><td class="code"><pre><span class="line">            $successor=<span class="keyword">$this</span>-&gt;mininumR($Node-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">264</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">// 将右子树赋值给后继节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">265</span></pre></td><td class="code"><pre><span class="line">            $successor-&gt;right=<span class="keyword">$this</span>-&gt;removeMinR($Node-&gt;right);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">266</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;size++; <span class="comment">//在removeMinR进行了size--</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">267</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">// 将左子树赋值给后继节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">268</span></pre></td><td class="code"><pre><span class="line">            $successor-&gt;left = $Node-&gt;left;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">269</span></pre></td><td class="code"><pre><span class="line">            $Node-&gt;left=$Node-&gt;right=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">270</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">271</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $successor;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">272</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">273</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">274</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//删除掉节点 e</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">275</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">// 以查找后继节点来代替当前节点来删除</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">276</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span>  <span class="title">removePrecursor</span><span class="params">($e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">277</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">$this</span>-&gt;root=<span class="keyword">$this</span>-&gt;removePrecursorR(<span class="keyword">$this</span>-&gt;root,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">278</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;root;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">279</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">280</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">public</span>  <span class="function"><span class="keyword">function</span> <span class="title">removePrecursorR</span><span class="params">($Node,$e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">281</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span> (is_null($Node))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">282</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> ;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">283</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">284</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e &lt; $e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">285</span></pre></td><td class="code"><pre><span class="line">            $Node-&gt;right=<span class="keyword">$this</span>-&gt;removePrecursorR($Node-&gt;right,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">286</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $Node; <span class="comment">//返回处理后的Node节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">287</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">288</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e &gt; $e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">289</span></pre></td><td class="code"><pre><span class="line">            $Node-&gt;left=<span class="keyword">$this</span>-&gt;removePrecursorR($Node-&gt;left,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">290</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $Node; <span class="comment">//返回处理后的Node节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">291</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">292</span></pre></td><td class="code"><pre><span class="line">        <span class="comment">//在 相等的这种情况 我们还要分为三种情况</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">293</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e==$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">294</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">//①要删除节点的左子树为null,这个时候直接返回右子树接可以了</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">295</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>($Node-&gt;left==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">296</span></pre></td><td class="code"><pre><span class="line">                $rightNode=$Node-&gt;right;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">297</span></pre></td><td class="code"><pre><span class="line">                $Node=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">298</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">299</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">return</span> $rightNode;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">300</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">301</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">//当删除的节点左子树为空的时候</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">302</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>($Node-&gt;right==<span class="keyword">null</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">303</span></pre></td><td class="code"><pre><span class="line">                $leftNode =$Node-&gt;left;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">304</span></pre></td><td class="code"><pre><span class="line">                $Node=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">305</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">306</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">return</span> $leftNode;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">307</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">308</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">//当左右子树都不为空的时候 ，这个时候我们找到前驱（左子树最大的节点）节点来代替要删除的节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">309</span></pre></td><td class="code"><pre><span class="line">            $Precursor=<span class="keyword">$this</span>-&gt;maxnumR($Node-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">310</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">//找到删除前驱后的左子树，并赋值给当前的前驱节点的左子树</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">311</span></pre></td><td class="code"><pre><span class="line">            $Precursor-&gt;left=<span class="keyword">$this</span>-&gt;removeMaxR($Node-&gt;left);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">312</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;size++; <span class="comment">//在removeMaxR中进行size--了为了语义明白 我做了一次size++</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">313</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">//将右子树赋值给前驱节点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">314</span></pre></td><td class="code"><pre><span class="line">            $Precursor-&gt;right = $Node-&gt;right;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">315</span></pre></td><td class="code"><pre><span class="line">            <span class="comment">//将$Node去除，并$size--</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">316</span></pre></td><td class="code"><pre><span class="line">            $Node=<span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">317</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">$this</span>-&gt;size--;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">318</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $Precursor;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">319</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">320</span></pre></td><td class="code"><pre><span class="line">     &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">321</span></pre></td><td class="code"><pre><span class="line">     <span class="comment">//比要找的元素 e 小的最大的元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">322</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">floor</span><span class="params">($e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">323</span></pre></td><td class="code"><pre><span class="line">        $ret=<span class="keyword">$this</span>-&gt;floorR(<span class="keyword">$this</span>-&gt;root,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">324</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">325</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">326</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">floorR</span><span class="params">($Node,$e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">327</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">328</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e&gt;=$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">329</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(is_null($Node-&gt;left))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">330</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $Node-&gt;e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">331</span></pre></td><td class="code"><pre><span class="line">           $ret=<span class="keyword">$this</span>-&gt;floorR($Node-&gt;left,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">332</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">333</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">334</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e&lt;$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">335</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(is_null($Node-&gt;right))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">336</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $Node-&gt;e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">337</span></pre></td><td class="code"><pre><span class="line">            $ret=<span class="keyword">$this</span>-&gt;floorR($Node-&gt;right,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">338</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">339</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">340</span></pre></td><td class="code"><pre><span class="line">     &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">341</span></pre></td><td class="code"><pre><span class="line">     <span class="comment">// 比要找元素e 大的最小元素</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">342</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">ceil</span><span class="params">($e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">343</span></pre></td><td class="code"><pre><span class="line">        $ret = <span class="keyword">$this</span>-&gt;ceilR(<span class="keyword">$this</span>-&gt;root,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">344</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">345</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">346</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">ceilR</span><span class="params">($Node,$e)</span></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">347</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e&gt;$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">348</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(is_null($Node-&gt;left))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">349</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">return</span> $Node-&gt;e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">350</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">351</span></pre></td><td class="code"><pre><span class="line">            $ret = <span class="keyword">$this</span>-&gt;ceilR($Node-&gt;left,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">352</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">353</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">354</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span>($Node-&gt;e&lt;=$e)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">355</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(is_null($Node-&gt;right))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">356</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">return</span> $Node-&gt;e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">357</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">358</span></pre></td><td class="code"><pre><span class="line">            $ret = <span class="keyword">$this</span>-&gt;ceilR($Node-&gt;right,$e);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">359</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> $ret;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">360</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">361</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">362</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+     
+         <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-----本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+       
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"><i class="fa fa-tag"></i> 算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/20/4-jQuery2/" rel="prev" title="jQuery选择器&对元素的操作">
+      <i class="fa fa-chevron-left"></i> jQuery选择器&对元素的操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/22/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E6%B3%95/" rel="next" title="PHP实现二分查找法（递归&非递归）">
+      PHP实现二分查找法（递归&非递归） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="comments"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#具体的代码实现"><span class="nav-number">2.</span> <span class="nav-text">具体的代码实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="lrn"
+      src="/images/1.jpeg">
+  <p class="site-author-name" itemprop="name">lrn</p>
+  <div class="site-description" itemprop="description">刻意练习，精益求精</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lrn80" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lrn80" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lrnjy@qq.com" title="E-Mail → mailto:lrnjy@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/./atom.xml" title="RSS → .&#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://wujiachen.top/" title="https:&#x2F;&#x2F;wujiachen.top&#x2F;" rel="noopener" target="_blank">前端伙伴吴佳宸</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lrn</span>
+  <span>&nbsp;<a href="http://www.beian.miit.gov.cn" target="_blank" rel="noopener">冀ICP备19017368号</a></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">230k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:29</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'qPPdCB10wfC3GeiBs9RE0V0F-gzGzoHsz',
+    appKey: 'kEfOYDNpi8cMuuGp4jv26wow',
+    placeholder: "发表你的想法，让我们一起进步吧",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+
+</body>
+</html>
